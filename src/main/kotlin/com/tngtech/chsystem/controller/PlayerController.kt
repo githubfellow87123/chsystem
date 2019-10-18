@@ -1,16 +1,21 @@
 package com.tngtech.chsystem.controller
 
-import org.springframework.stereotype.Controller
-import org.springframework.ui.Model
-import org.springframework.ui.set
+import com.tngtech.chsystem.dao.PlayerRepository
+import com.tngtech.chsystem.entities.Player
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
-@Controller
-class PlayerController {
+@RestController
+@RequestMapping("/players")
+class PlayerController(private val playerRepository: PlayerRepository) {
 
     @GetMapping("/")
-    fun blog(model: Model): String {
-        model["name"] = "Bernd"
-        return "user"
+    fun findAll() = playerRepository.findAll()
+
+    @PostMapping("/")
+    fun insertPlayer(player: Player) {
+        playerRepository.save(player);
     }
 }

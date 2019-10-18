@@ -20,9 +20,8 @@ class PlayerControllerTest(@Autowired val restTemplate: TestRestTemplate) {
 
     @Test
     fun `Assert blog page title, content and status code`() {
-        val entity = restTemplate.getForEntity<String>("/")
+        val entity = restTemplate.getForEntity<String>("/players")
         assertThat(entity.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(entity.body).contains("<h1>Bernd</h1>")
     }
 
     @Test
