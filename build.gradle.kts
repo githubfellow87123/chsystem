@@ -4,8 +4,16 @@ plugins {
     kotlin("jvm") version "1.3.50"
     kotlin("plugin.jpa") version "1.3.50"
     kotlin("plugin.spring") version "1.3.50"
+    kotlin("plugin.allopen") version "1.3.50"
+
     id("org.springframework.boot") version "2.2.0.RELEASE"
     id("io.spring.dependency-management") version "1.0.8.RELEASE"
+}
+
+allOpen {
+    annotation("javax.persistence.Entity")
+    annotation("javax.persistence.Embeddable")
+    annotation("javax.persistence.MappedSuperclass")
 }
 
 group = "com.tngtech"
@@ -38,7 +46,13 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
+        exclude(module = "junit")
+        exclude(module = "mockito-core")
     }
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testImplementation("com.ninja-squad:springmockk:1.1.3")
+
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 
 tasks.withType<Test> {
