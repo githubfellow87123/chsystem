@@ -8,13 +8,13 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/players")
+@RequestMapping("players")
 class PlayerController(private val playerRepository: PlayerRepository) {
 
-    @GetMapping("/")
+    @GetMapping
     fun findAll() = playerRepository.findAll()
 
-    @PostMapping("/")
+    @PostMapping
     fun insertPlayer(player: Player) {
         playerRepository.save(player);
     }
