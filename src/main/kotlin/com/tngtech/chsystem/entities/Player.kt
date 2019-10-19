@@ -6,10 +6,9 @@ import javax.persistence.Entity
 import javax.persistence.Id
 
 @Entity
-class Player(
+data class Player(
     var name: String,
-    var createdAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: LocalDateTime = LocalDateTime.now(),
     @Id
-    var id: UUID = UUID.randomUUID()
+    val id: UUID = UUID.randomUUID()
 )
-
