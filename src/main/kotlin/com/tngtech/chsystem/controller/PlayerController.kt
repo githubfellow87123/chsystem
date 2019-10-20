@@ -19,8 +19,7 @@ class PlayerController(private val playerRepository: PlayerRepository) {
         return players.map { it.toPlayerModel() }
     }
 
-    @GetMapping
-    @RequestMapping("{id}")
+    @GetMapping("{id}")
     fun findPlayerById(@PathVariable id: UUID): PlayerModel {
 
         val player = playerRepository.findById(id)
@@ -31,7 +30,6 @@ class PlayerController(private val playerRepository: PlayerRepository) {
 
         return player.get().toPlayerModel()
     }
-
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
