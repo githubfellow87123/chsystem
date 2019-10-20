@@ -13,7 +13,7 @@ class PlayerController(private val playerRepository: PlayerRepository) {
     fun findAll(): List<PlayerModel> {
         val players = playerRepository.findAll()
 
-        return players.map { p -> PlayerModel(p.name) }
+        return players.map { p -> PlayerModel(id = p.id, name = p.name, createdAt = p.createdAt) }
     }
 
     @PostMapping
