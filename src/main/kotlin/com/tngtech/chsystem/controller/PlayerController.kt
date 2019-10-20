@@ -3,6 +3,7 @@ package com.tngtech.chsystem.controller
 import com.tngtech.chsystem.dao.PlayerRepository
 import com.tngtech.chsystem.entities.PlayerEntity
 import com.tngtech.chsystem.model.PlayerModel
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -64,8 +65,18 @@ class PlayerController(private val playerRepository: PlayerRepository) {
         }
 
         playerRepository.save(playerEntity)
-        
+
         return playerEntity.toPlayerModel()
+    }
+
+    @DeleteMapping("{id}")
+    fun deletePlayer(@PathVariable id: UUID) {
+
+        try {
+            playerRepository.deleteById(id)
+        } catch (e: EmptyResultDataAccessException) {
+            throw PlayerNotFoundException(id)
+        }
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
