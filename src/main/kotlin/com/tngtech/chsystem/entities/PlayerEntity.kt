@@ -6,7 +6,7 @@ import javax.persistence.Entity
 import javax.persistence.Id
 
 @Entity
-data class Player(
+data class PlayerEntity(
     @Id
     val id: UUID = UUID.randomUUID(),
     var name: String,

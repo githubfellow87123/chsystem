@@ -1,6 +1,6 @@
 package com.tngtech.chsystem.dao
 
-import com.tngtech.chsystem.entities.Player
+import com.tngtech.chsystem.entities.PlayerEntity
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,7 +15,7 @@ class PlayerRepositoryTest @Autowired constructor(
 
     @Test
     fun `When findByLogin then return User`() {
-        val player = Player(name = "Bernd")
+        val player = PlayerEntity(name = "Bernd")
         entityManager.persist(player)
         entityManager.flush()
         val user = playerRepository.findByName("Bernd")
