@@ -13,14 +13,26 @@ class PlayerController(private val playerRepository: PlayerRepository) {
     fun findAll(): List<PlayerModel> {
         val players = playerRepository.findAll()
 
-        return players.map { p -> PlayerModel(id = p.id, name = p.name, createdAt = p.createdAt) }
+        return players.map { it.toPersonModel() }
     }
 
     @PostMapping
-    fun insertPlayer(@RequestBody playerModel: PlayerModel) {
+    fun insertPlayer(@RequestBody playerModel: PlayerModel): PlayerModel {
 
-        val player = PlayerEntity(name = playerModel.name)
+        val player = playerModel.toPlayerEntity()
 
         playerRepository.save(player)
+
+        return player.toPersonModel()
     }
+
+    fun PlayerEntity.toPersonModel() = PlayerModel(
+        id = id,
+        name = name,
+        createdAt = createdAt
+    )
+
+    fun PlayerModel.toPlayerEntity() = PlayerEntity(
+        name = name
+    )
 }
