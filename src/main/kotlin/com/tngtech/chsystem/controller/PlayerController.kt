@@ -19,7 +19,7 @@ class PlayerController(private val playerRepository: PlayerRepository) {
     @PostMapping
     fun insertPlayer(@RequestBody playerModel: PlayerModel) {
 
-        val player = Player(playerModel.name)
+        val player = Player(name = playerModel.name)
 
         playerRepository.save(player)
     }

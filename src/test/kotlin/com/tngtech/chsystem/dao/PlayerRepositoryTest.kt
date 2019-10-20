@@ -15,10 +15,10 @@ class PlayerRepositoryTest @Autowired constructor(
 
     @Test
     fun `When findByLogin then return User`() {
-        val bernd = Player("Bernd")
-        entityManager.persist(bernd)
+        val player = Player(name = "Bernd")
+        entityManager.persist(player)
         entityManager.flush()
         val user = playerRepository.findByName("Bernd")
-        assertThat(user).isEqualTo(bernd)
+        assertThat(user).isEqualTo(player)
     }
 }

@@ -7,8 +7,8 @@ import javax.persistence.Id
 
 @Entity
 data class Player(
-    var name: String,
-    val createdAt: LocalDateTime = LocalDateTime.now(),
     @Id
-    val id: UUID = UUID.randomUUID()
+    val id: UUID = UUID.randomUUID(),
+    var name: String,
+    val createdAt: LocalDateTime = LocalDateTime.now()
 )
