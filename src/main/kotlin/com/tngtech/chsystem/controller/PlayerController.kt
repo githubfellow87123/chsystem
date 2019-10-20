@@ -42,8 +42,38 @@ class PlayerController(private val playerRepository: PlayerRepository) {
         return player.toPlayerModel()
     }
 
+    @PutMapping("{id}")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun updateOrInsertPlayer(
+        @PathVariable id: UUID,
+        @RequestBody playerModel: PlayerModel
+    ): PlayerModel {
+
+        if (playerModel.id != null && playerModel.id != id) {
+            throw PlayerIdMismatchException(id, playerModel.id)
+        }
+
+        val playerEntityOptional = playerRepository.findById(id)
+        val playerEntity: PlayerEntity
+
+        if (playerEntityOptional.isPresent) {
+            playerEntity = playerEntityOptional.get()
+            playerEntity.name = playerModel.name
+        } else {
+            playerEntity = PlayerEntity(id = id, name = playerModel.name)
+        }
+
+        playerRepository.save(playerEntity)
+        
+        return playerEntity.toPlayerModel()
+    }
+
     @ResponseStatus(HttpStatus.NOT_FOUND)
     class PlayerNotFoundException(id: UUID) : RuntimeException("No player found with id: $id")
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    class PlayerIdMismatchException(pathVariableId: UUID, requestBodyId: UUID) :
+        RuntimeException("Id mismatch between path  $pathVariableId and request body $requestBodyId")
 
     fun PlayerEntity.toPlayerModel() = PlayerModel(
         id = id,
