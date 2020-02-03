@@ -3,6 +3,7 @@ package com.tngtech.chsystem.controller
 import com.tngtech.chsystem.dao.PlayerRepository
 import com.tngtech.chsystem.entities.PlayerEntity
 import com.tngtech.chsystem.model.PlayerModel
+import mu.KotlinLogging
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -11,6 +12,8 @@ import java.util.*
 @RestController
 @RequestMapping("players")
 class PlayerController(private val playerRepository: PlayerRepository) {
+
+    private val logger = KotlinLogging.logger {}
 
     @GetMapping
     fun findAllPlayers(): List<PlayerModel> {
@@ -38,7 +41,8 @@ class PlayerController(private val playerRepository: PlayerRepository) {
 
         val player = playerModel.toPlayerEntity()
 
-        playerRepository.save(player)
+        val playerEntity = playerRepository.save(player)
+        logger.info { "Created new player $playerEntity" }
 
         return player.toPlayerModel()
     }
