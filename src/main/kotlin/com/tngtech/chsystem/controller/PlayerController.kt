@@ -41,6 +41,11 @@ class PlayerController(private val playerRepository: PlayerRepository) {
 
         val player = playerModel.toPlayerEntity()
 
+        val playerInDb = playerRepository.findByName(playerModel.name)
+        if (playerInDb != null) {
+            throw DuplicatePlayerNameException(playerModel.name)
+        }
+
         val playerEntity = playerRepository.save(player)
         logger.info { "Created new player $playerEntity" }
 
@@ -85,6 +90,9 @@ class PlayerController(private val playerRepository: PlayerRepository) {
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     class PlayerNotFoundException(id: UUID) : RuntimeException("No player found with id: $id")
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    class DuplicatePlayerNameException(name: String) : RuntimeException("A player with $name already exists: $name")
 
     @ResponseStatus(HttpStatus.CONFLICT)
     class PlayerIdMismatchException(pathVariableId: UUID, requestBodyId: UUID) :
