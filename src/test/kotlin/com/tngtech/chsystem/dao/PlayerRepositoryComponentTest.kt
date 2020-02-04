@@ -8,7 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 
 @DataJpaTest
-class PlayerRepositoryTest @Autowired constructor(
+class PlayerRepositoryComponentTest @Autowired constructor(
     val entityManager: TestEntityManager,
     val playerRepository: PlayerRepository
 ) {
