@@ -5,20 +5,17 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 
 @DataJpaTest
-class PlayerRepositoryComponentTest @Autowired constructor(
-    val entityManager: TestEntityManager,
-    val playerRepository: PlayerRepository
+class PlayerRepositoryComponentTest(
+    @Autowired val playerRepository: PlayerRepository
 ) {
 
     @Test
-    fun `When findByLogin then return User`() {
+    fun `findByName finds player by name`() {
         val player = PlayerEntity(name = "Bernd")
-        entityManager.persist(player)
-        entityManager.flush()
-        val user = playerRepository.findByName("Bernd")
-        assertThat(user).isEqualTo(player)
+        playerRepository.save(player)
+        val foundPlayer = playerRepository.findByName("Bernd")
+        assertThat(foundPlayer).isEqualTo(player)
     }
 }
