@@ -51,6 +51,7 @@ dependencies {
     }
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("com.ninja-squad:springmockk:1.1.3")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.3.61")
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }

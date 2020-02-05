@@ -11,7 +11,9 @@ import java.util.*
 
 @RestController
 @RequestMapping("players")
-class PlayerController(private val playerRepository: PlayerRepository) {
+class PlayerController(
+    private val playerRepository: PlayerRepository
+) {
 
     private val logger = KotlinLogging.logger {}
 
@@ -98,13 +100,13 @@ class PlayerController(private val playerRepository: PlayerRepository) {
     class PlayerIdMismatchException(pathVariableId: UUID, requestBodyId: UUID) :
         RuntimeException("Id mismatch between path  $pathVariableId and request body $requestBodyId")
 
-    fun PlayerEntity.toPlayerModel() = PlayerModel(
+    private fun PlayerEntity.toPlayerModel() = PlayerModel(
         id = id,
         name = name,
         createdAt = createdAt
     )
 
-    fun PlayerModel.toPlayerEntity() = PlayerEntity(
+    private fun PlayerModel.toPlayerEntity() = PlayerEntity(
         name = name
     )
 }
