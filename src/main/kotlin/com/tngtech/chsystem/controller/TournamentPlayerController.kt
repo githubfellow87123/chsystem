@@ -22,13 +22,13 @@ class TournamentPlayerController(
         @PathVariable playerId: UUID,
         @RequestBody assignPlayerToTournamentModel: AssignPlayerToTournamentModel
     ) {
-        if (!tournamentId.equals(assignPlayerToTournamentModel.tournamentId)) {
+        if (tournamentId != assignPlayerToTournamentModel.tournamentId) {
             throw TournamentMismatchException(
                 "The tournamentId '$tournamentId' in the path variable does not match " +
                         "the id in the body ${assignPlayerToTournamentModel.tournamentId}"
             )
         }
-        if (!playerId.equals(assignPlayerToTournamentModel.playerId)) {
+        if (playerId != assignPlayerToTournamentModel.playerId) {
             throw PlayerMismatchException(
                 "The playerId '$playerId' in the path variable does not match " +
                         "the id in the body ${assignPlayerToTournamentModel.playerId}"
