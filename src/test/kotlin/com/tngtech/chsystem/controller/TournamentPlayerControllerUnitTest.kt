@@ -4,7 +4,7 @@ import com.tngtech.chsystem.dao.PlayerRepository
 import com.tngtech.chsystem.dao.TournamentRepository
 import com.tngtech.chsystem.entities.PlayerEntity
 import com.tngtech.chsystem.entities.TournamentEntity
-import com.tngtech.chsystem.model.AssignPlayerToTournamentModel
+import com.tngtech.chsystem.model.PlayerToTournamentModel
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -30,10 +30,10 @@ internal class TournamentPlayerControllerUnitTest {
     lateinit var playerRepository: PlayerRepository
 
     @Test
-    fun `assignPlayerToTournament`() {
+    fun assignPlayerToTournament() {
         val tournament = TournamentEntity()
         val player = PlayerEntity(name = "Alex")
-        val assignPlayerToTournamentModel = AssignPlayerToTournamentModel(tournament.id, player.id)
+        val playerToTournamentModel = PlayerToTournamentModel(tournament.id, player.id)
         val tournamentSlot = slot<TournamentEntity>()
 
         every { playerRepository.findByIdOrNull(player.id) } returns player
@@ -47,7 +47,7 @@ internal class TournamentPlayerControllerUnitTest {
         tournamentPlayerController.assignPlayerToTournament(
             tournament.id,
             player.id,
-            assignPlayerToTournamentModel
+            playerToTournamentModel
         )
 
         assertThat(tournamentSlot.captured.players).containsExactly(player)
@@ -57,13 +57,13 @@ internal class TournamentPlayerControllerUnitTest {
     fun `assignPlayerToTournament throws exception if player id mismatches`() {
         val tournament = TournamentEntity()
         val player = PlayerEntity(name = "Alex")
-        val assignPlayerToTournamentModel = AssignPlayerToTournamentModel(tournament.id, UUID.randomUUID())
+        val playerToTournamentModel = PlayerToTournamentModel(tournament.id, UUID.randomUUID())
 
         assertFailsWith<TournamentPlayerController.PlayerMismatchException> {
             tournamentPlayerController.assignPlayerToTournament(
                 tournament.id,
                 player.id,
-                assignPlayerToTournamentModel
+                playerToTournamentModel
             )
         }
     }
@@ -72,13 +72,13 @@ internal class TournamentPlayerControllerUnitTest {
     fun `assignPlayerToTournament throws exception if tournament id mismatches`() {
         val tournament = TournamentEntity()
         val player = PlayerEntity(name = "Alex")
-        val assignPlayerToTournamentModel = AssignPlayerToTournamentModel(UUID.randomUUID(), player.id)
+        val playerToTournamentModel = PlayerToTournamentModel(UUID.randomUUID(), player.id)
 
         assertFailsWith<TournamentPlayerController.TournamentMismatchException> {
             tournamentPlayerController.assignPlayerToTournament(
                 tournament.id,
                 player.id,
-                assignPlayerToTournamentModel
+                playerToTournamentModel
             )
         }
     }
@@ -87,7 +87,7 @@ internal class TournamentPlayerControllerUnitTest {
     fun `assignPlayerToTournament throws exception if player doesn't exist`() {
         val tournament = TournamentEntity()
         val playerId = UUID.randomUUID()
-        val assignPlayerToTournamentModel = AssignPlayerToTournamentModel(tournament.id, playerId)
+        val playerToTournamentModel = PlayerToTournamentModel(tournament.id, playerId)
 
         every { playerRepository.findByIdOrNull(playerId) } returns null
         every { tournamentRepository.findByIdOrNull(tournament.id) } returns tournament
@@ -96,7 +96,7 @@ internal class TournamentPlayerControllerUnitTest {
             tournamentPlayerController.assignPlayerToTournament(
                 tournament.id,
                 playerId,
-                assignPlayerToTournamentModel
+                playerToTournamentModel
             )
         }
     }
@@ -105,7 +105,7 @@ internal class TournamentPlayerControllerUnitTest {
     fun `assignPlayerToTournament throws exception if tournament doesn't exist`() {
         val tournamentId = UUID.randomUUID()
         val player = PlayerEntity(name = "Alex")
-        val assignPlayerToTournamentModel = AssignPlayerToTournamentModel(tournamentId, player.id)
+        val playerToTournamentModel = PlayerToTournamentModel(tournamentId, player.id)
 
         every { playerRepository.findByIdOrNull(player.id) } returns player
         every { tournamentRepository.findByIdOrNull(tournamentId) } returns null
@@ -114,8 +114,33 @@ internal class TournamentPlayerControllerUnitTest {
             tournamentPlayerController.assignPlayerToTournament(
                 tournamentId,
                 player.id,
-                assignPlayerToTournamentModel
+                playerToTournamentModel
             )
         }
+    }
+
+    @Test
+    fun removePlayerFromTournament() {
+        val tournament = TournamentEntity()
+        val player = PlayerEntity(name = "Alex")
+        tournament.players.add(player)
+        val playerToTournamentModel = PlayerToTournamentModel(tournament.id, player.id)
+        val tournamentSlot = slot<TournamentEntity>()
+
+        every { playerRepository.findByIdOrNull(player.id) } returns player
+        every { tournamentRepository.findByIdOrNull(tournament.id) } returns tournament
+        every {
+            tournamentRepository.save(capture(tournamentSlot))
+        } answers {
+            tournamentSlot.captured
+        }
+
+        tournamentPlayerController.removePlayerFromTournament(
+            tournament.id,
+            player.id,
+            playerToTournamentModel
+        )
+
+        assertThat(tournamentSlot.captured.players).isEmpty()
     }
 }

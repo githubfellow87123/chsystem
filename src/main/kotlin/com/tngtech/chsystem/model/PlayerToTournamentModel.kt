@@ -2,7 +2,7 @@ package com.tngtech.chsystem.model
 
 import java.util.*
 
-data class AssignPlayerToTournamentModel(
+data class PlayerToTournamentModel(
     val tournamentId: UUID,
     val playerId: UUID
 )

@@ -2,7 +2,7 @@ package com.tngtech.chsystem.controller
 
 import com.tngtech.chsystem.dao.PlayerRepository
 import com.tngtech.chsystem.dao.TournamentRepository
-import com.tngtech.chsystem.model.AssignPlayerToTournamentModel
+import com.tngtech.chsystem.model.PlayerToTournamentModel
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -20,29 +20,54 @@ class TournamentPlayerController(
     fun assignPlayerToTournament(
         @PathVariable tournamentId: UUID,
         @PathVariable playerId: UUID,
-        @RequestBody assignPlayerToTournamentModel: AssignPlayerToTournamentModel
+        @RequestBody playerToTournamentModel: PlayerToTournamentModel
     ) {
-        if (tournamentId != assignPlayerToTournamentModel.tournamentId) {
-            throw TournamentMismatchException(
-                "The tournamentId '$tournamentId' in the path variable does not match " +
-                        "the id in the body ${assignPlayerToTournamentModel.tournamentId}"
-            )
-        }
-        if (playerId != assignPlayerToTournamentModel.playerId) {
-            throw PlayerMismatchException(
-                "The playerId '$playerId' in the path variable does not match " +
-                        "the id in the body ${assignPlayerToTournamentModel.playerId}"
-            )
-        }
-
-        val tournament = tournamentRepository.findByIdOrNull(tournamentId)
-            ?: throw TournamentMismatchException("Tournament with id $tournamentId does not exist")
-
-        val player = playerRepository.findByIdOrNull(playerId)
-            ?: throw PlayerMismatchException("Player with id $playerId does not exist")
+        checkIfIdsMatch(tournamentId, playerId, playerToTournamentModel)
+        val tournament = findTournament(tournamentId)
+        val player = findPlayer(playerId)
 
         tournament.players.add(player)
         tournamentRepository.save(tournament)
+    }
+
+    @DeleteMapping("{playerId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun removePlayerFromTournament(
+        @PathVariable tournamentId: UUID,
+        @PathVariable playerId: UUID,
+        @RequestBody playerToTournamentModel: PlayerToTournamentModel
+    ) {
+        checkIfIdsMatch(tournamentId, playerId, playerToTournamentModel)
+        val tournament = findTournament(tournamentId)
+        val player = findPlayer(playerId)
+
+        tournament.players.remove(player)
+        tournamentRepository.save(tournament)
+    }
+
+    private fun findPlayer(playerId: UUID) = (playerRepository.findByIdOrNull(playerId)
+        ?: throw PlayerMismatchException("Player with id $playerId does not exist"))
+
+    private fun findTournament(tournamentId: UUID) = (tournamentRepository.findByIdOrNull(tournamentId)
+        ?: throw TournamentMismatchException("Tournament with id $tournamentId does not exist"))
+
+    private fun checkIfIdsMatch(
+        tournamentId: UUID,
+        playerId: UUID,
+        playerToTournamentModel: PlayerToTournamentModel
+    ) {
+        if (tournamentId != playerToTournamentModel.tournamentId) {
+            throw TournamentMismatchException(
+                "The tournamentId '$tournamentId' in the path variable does not match " +
+                        "the id in the body ${playerToTournamentModel.tournamentId}"
+            )
+        }
+        if (playerId != playerToTournamentModel.playerId) {
+            throw PlayerMismatchException(
+                "The playerId '$playerId' in the path variable does not match " +
+                        "the id in the body ${playerToTournamentModel.playerId}"
+            )
+        }
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)
