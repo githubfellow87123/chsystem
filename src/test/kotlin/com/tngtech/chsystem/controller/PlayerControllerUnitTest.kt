@@ -91,11 +91,14 @@ internal class PlayerControllerUnitTest {
         }
     }
 
-    fun modelIds(): Stream<Arguments> =
-        Stream.of(
-            Arguments.of(null),
-            Arguments.of(UUID.randomUUID())
-        )
+    companion object {
+        @JvmStatic
+        fun modelIds(): Stream<Arguments> =
+            Stream.of(
+                Arguments.of(null),
+                Arguments.of(UUID.randomUUID())
+            )
+    }
 
     @ParameterizedTest
     @MethodSource("modelIds")

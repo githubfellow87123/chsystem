@@ -29,7 +29,7 @@ class PlayerControllerIntegrationTest(
         assertThat(playerResponse.body?.createdAt).isNotNull()
 
         assertThat(playersResponse.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(playersResponse.body).hasSize(1);
+        assertThat(playersResponse.body).hasSize(1)
     }
 
     fun buildCreatePlayerRequest(playerName: String): HttpEntity<String> {
