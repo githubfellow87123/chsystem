@@ -143,4 +143,22 @@ internal class TournamentPlayerControllerUnitTest {
 
         assertThat(tournamentSlot.captured.players).isEmpty()
     }
+
+    @Test
+    fun `removePlayerFromTournament throws exception when player is not assigned to tournament`() {
+        val tournament = TournamentEntity()
+        val player = PlayerEntity(name = "Alex")
+        val playerToTournamentModel = PlayerToTournamentModel(tournament.id, player.id)
+
+        every { playerRepository.findByIdOrNull(player.id) } returns player
+        every { tournamentRepository.findByIdOrNull(tournament.id) } returns tournament
+
+        assertFailsWith<TournamentPlayerController.PlayerNotAssignedToTournamentException> {
+            tournamentPlayerController.removePlayerFromTournament(
+                tournament.id,
+                player.id,
+                playerToTournamentModel
+            )
+        }
+    }
 }

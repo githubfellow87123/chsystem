@@ -41,8 +41,12 @@ class TournamentPlayerController(
         val tournament = findTournament(tournamentId)
         val player = findPlayer(playerId)
 
-        tournament.players.remove(player)
-        tournamentRepository.save(tournament)
+        if (tournament.players.contains(player)) {
+            tournament.players.remove(player)
+            tournamentRepository.save(tournament)
+        } else {
+            throw PlayerNotAssignedToTournamentException("Player with id $playerId is not assigned to tournament with id $tournamentId")
+        }
     }
 
     private fun findPlayer(playerId: UUID) = (playerRepository.findByIdOrNull(playerId)
@@ -75,5 +79,8 @@ class TournamentPlayerController(
 
     @ResponseStatus(HttpStatus.CONFLICT)
     class PlayerMismatchException(message: String) : RuntimeException(message)
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    class PlayerNotAssignedToTournamentException(message: String) : RuntimeException(message)
 
 }
