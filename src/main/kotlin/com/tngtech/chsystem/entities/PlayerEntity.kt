@@ -9,6 +9,7 @@ import javax.persistence.Id
 @Entity
 data class PlayerEntity(
     @Id
+    @Column(columnDefinition = "UUID")
     val id: UUID = UUID.randomUUID(),
     @Column(unique = true, nullable = false)
     var name: String,

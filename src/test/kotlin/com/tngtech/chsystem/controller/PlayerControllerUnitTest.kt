@@ -10,7 +10,6 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.slot
 import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
@@ -29,11 +28,6 @@ internal class PlayerControllerUnitTest {
 
     @InjectMockKs
     lateinit var playerController: PlayerController
-
-    @BeforeAll
-    private fun init() {
-        playerController = PlayerController(playerRepository)
-    }
 
     @Test
     fun findAllPlayers() {

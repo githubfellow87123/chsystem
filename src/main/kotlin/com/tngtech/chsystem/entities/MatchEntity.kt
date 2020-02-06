@@ -6,6 +6,7 @@ import javax.persistence.*
 @Entity
 data class MatchEntity(
     @Id
+    @Column(columnDefinition = "UUID")
     val id: UUID = UUID.randomUUID(),
     @Column(nullable = false)
     val roundIndex: Int,
