@@ -13,6 +13,7 @@ import io.mockk.verify
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.time.LocalDate
 
 @ExtendWith(MockKExtension::class)
 internal class TournamentControllerUnitTest {
@@ -39,6 +40,27 @@ internal class TournamentControllerUnitTest {
         verify { tournamentRepository.save(tournamentEntity) }
         Assertions.assertThat(tournamentEntity.id).isNotNull()
         Assertions.assertThat(tournamentEntity.date).isToday()
+        Assertions.assertThat(tournamentEntity.roundIndex).isEqualTo(0)
+        Assertions.assertThat(tournamentEntity.state).isEqualTo(TournamentState.INITIALIZING)
+    }
+
+    @Test
+    fun `date is settable with insertPlayer`() {
+        val tournamentEntitySlot = slot<TournamentEntity>()
+        val date = LocalDate.of(2000, 12, 27)
+
+        every {
+            tournamentRepository.save(capture(tournamentEntitySlot))
+        } answers {
+            tournamentEntitySlot.captured
+        }
+
+        tournamentController.insertTournament(TournamentModel(date = date))
+
+        val tournamentEntity = tournamentEntitySlot.captured
+        verify { tournamentRepository.save(tournamentEntity) }
+        Assertions.assertThat(tournamentEntity.id).isNotNull()
+        Assertions.assertThat(tournamentEntity.date).isEqualTo(date)
         Assertions.assertThat(tournamentEntity.roundIndex).isEqualTo(0)
         Assertions.assertThat(tournamentEntity.state).isEqualTo(TournamentState.INITIALIZING)
     }
