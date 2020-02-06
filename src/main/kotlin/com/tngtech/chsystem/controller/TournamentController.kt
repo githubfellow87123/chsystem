@@ -26,6 +26,21 @@ class TournamentController(
         return tournamentEntity.toTournamentModel()
     }
 
+    @GetMapping
+    fun listTournaments(): List<TournamentModel> {
+        return tournamentRepository.findAll()
+            .map { entity -> entity.toTournamentModel() }
+            .sortedByDescending { tournament -> tournament.date }
+    }
+
+    // TODO add method to start the tournament (state = IN_PROGRESS)
+
+    // TODO add method to switch over to the next round in a tournament
+
+    // TODO add method to finish a tournament
+
+    // TODO add method to fetch a tournament
+
     private fun TournamentModel.toTournamentEntity(): TournamentEntity {
         return if (date == null) TournamentEntity() else TournamentEntity(date = date)
     }
