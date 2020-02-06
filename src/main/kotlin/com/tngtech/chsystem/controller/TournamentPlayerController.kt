@@ -2,6 +2,8 @@ package com.tngtech.chsystem.controller
 
 import com.tngtech.chsystem.dao.PlayerRepository
 import com.tngtech.chsystem.dao.TournamentRepository
+import com.tngtech.chsystem.entities.TournamentEntity
+import com.tngtech.chsystem.entities.TournamentState
 import com.tngtech.chsystem.model.PlayerToTournamentModel
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -24,6 +26,8 @@ class TournamentPlayerController(
     ) {
         checkIfIdsMatch(tournamentId, playerId, playerToTournamentModel)
         val tournament = findTournament(tournamentId)
+        checkTournamentState(tournament)
+
         val player = findPlayer(playerId)
 
         tournament.players.add(player)
@@ -39,6 +43,8 @@ class TournamentPlayerController(
     ) {
         checkIfIdsMatch(tournamentId, playerId, playerToTournamentModel)
         val tournament = findTournament(tournamentId)
+        checkTournamentState(tournament)
+
         val player = findPlayer(playerId)
 
         if (tournament.players.contains(player)) {
@@ -46,6 +52,12 @@ class TournamentPlayerController(
             tournamentRepository.save(tournament)
         } else {
             throw PlayerNotAssignedToTournamentException("Player with id $playerId is not assigned to tournament with id $tournamentId")
+        }
+    }
+
+    private fun checkTournamentState(tournament: TournamentEntity) {
+        if (tournament.state != TournamentState.INITIALIZING) {
+            throw TournamentAlreadyStartedException("Can't change participating players when tournament is already started")
         }
     }
 
@@ -82,5 +94,8 @@ class TournamentPlayerController(
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     class PlayerNotAssignedToTournamentException(message: String) : RuntimeException(message)
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    class TournamentAlreadyStartedException(message: String) : RuntimeException(message)
 
 }

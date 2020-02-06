@@ -4,6 +4,7 @@ import com.tngtech.chsystem.dao.PlayerRepository
 import com.tngtech.chsystem.dao.TournamentRepository
 import com.tngtech.chsystem.entities.PlayerEntity
 import com.tngtech.chsystem.entities.TournamentEntity
+import com.tngtech.chsystem.entities.TournamentState
 import com.tngtech.chsystem.model.PlayerToTournamentModel
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
@@ -13,6 +14,8 @@ import io.mockk.slot
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.data.repository.findByIdOrNull
 import java.util.*
 import kotlin.test.assertFailsWith
@@ -117,6 +120,27 @@ internal class TournamentPlayerControllerUnitTest {
                 playerToTournamentModel
             )
         }
+    }
+
+    @ParameterizedTest
+    @EnumSource(TournamentState::class, names = ["INITIALIZING"], mode = EnumSource.Mode.EXCLUDE)
+    fun `assignPlayerToTournament throws exception if tournament already started`(state: TournamentState) {
+        val tournament = TournamentEntity(state = state)
+        val player = PlayerEntity(name = "Alex")
+        val playerToTournamentModel = PlayerToTournamentModel(tournament.id, player.id)
+
+        every { playerRepository.findByIdOrNull(player.id) } returns player
+        every { tournamentRepository.findByIdOrNull(tournament.id) } returns tournament
+
+        assertFailsWith<TournamentPlayerController.TournamentAlreadyStartedException> {
+            tournamentPlayerController.assignPlayerToTournament(
+                tournament.id,
+                player.id,
+                playerToTournamentModel
+            )
+        }
+
+
     }
 
     @Test
