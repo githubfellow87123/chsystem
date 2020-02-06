@@ -1,17 +1,19 @@
 package com.tngtech.chsystem.entities
 
-import java.time.LocalDateTime
+import java.time.LocalDate
 import java.util.*
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Id
 
 @Entity
-data class PlayerEntity(
+data class TournamentEntity(
     @Id
     val id: UUID = UUID.randomUUID(),
-    @Column(unique = true, nullable = false)
-    var name: String,
     @Column(nullable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now()
+    val date: LocalDate = LocalDate.now(),
+    @Column(nullable = false)
+    var state: TournamentState = TournamentState.INITIALIZING,
+    @Column
+    var roundIndex: Int
 )
