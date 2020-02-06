@@ -15,5 +15,12 @@ data class TournamentEntity(
     @Enumerated(EnumType.STRING)
     var state: TournamentState = TournamentState.INITIALIZING,
     @Column
-    var roundIndex: Int = 0
+    var roundIndex: Int = 0,
+    @ManyToMany
+    @JoinTable(
+        name = "TOURNAMENT_PLAYERS",
+        joinColumns = [JoinColumn(name = "TOURNAMENT_ID", referencedColumnName = "ID")],
+        inverseJoinColumns = [JoinColumn(name = "PLAYER_ID", referencedColumnName = "ID")]
+    )
+    var players: MutableSet<PlayerEntity> = mutableSetOf()
 )
