@@ -5,6 +5,7 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
+@Table(name = "TOURNAMENT")
 data class TournamentEntity(
     @Id
     @Column(columnDefinition = "UUID")

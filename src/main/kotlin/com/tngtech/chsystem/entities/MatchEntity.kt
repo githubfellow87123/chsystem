@@ -4,6 +4,7 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
+@Table(name = "MATCH")
 data class MatchEntity(
     @Id
     @Column(columnDefinition = "UUID")
