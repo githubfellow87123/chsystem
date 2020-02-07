@@ -23,5 +23,7 @@ data class TournamentEntity(
         joinColumns = [JoinColumn(name = "TOURNAMENT_ID", referencedColumnName = "ID")],
         inverseJoinColumns = [JoinColumn(name = "PLAYER_ID", referencedColumnName = "ID")]
     )
-    var players: MutableSet<PlayerEntity> = mutableSetOf()
+    var players: MutableSet<PlayerEntity> = mutableSetOf(),
+    @OneToMany
+    var matches: MutableSet<MatchEntity> = mutableSetOf()
 )

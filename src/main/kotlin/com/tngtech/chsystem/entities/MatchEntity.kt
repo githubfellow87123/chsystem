@@ -16,5 +16,7 @@ data class MatchEntity(
     val player1: PlayerEntity,
     @ManyToOne
     @JoinColumn(name = "PLAYER_2_ID", nullable = false, updatable = false)
-    val player2: PlayerEntity
+    val player2: PlayerEntity,
+    @ManyToOne
+    val tournament: TournamentEntity
 )
