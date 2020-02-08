@@ -14,9 +14,9 @@ data class TournamentEntity(
     val date: LocalDate = LocalDate.now(),
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    var state: TournamentState = TournamentState.INITIALIZING,
+    val state: TournamentState = TournamentState.INITIALIZING,
     @Column
-    var roundIndex: Int = 0,
+    val roundIndex: Int = 0,
     @ManyToMany
     @JoinTable(
         name = "TOURNAMENT_PLAYERS",

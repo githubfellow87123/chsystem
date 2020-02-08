@@ -7,6 +7,6 @@ import java.util.*
 data class TournamentModel(
     val id: UUID? = null,
     val date: LocalDate = LocalDate.now(),
-    var state: TournamentState? = null,
-    var roundIndex: Int? = null
+    val state: TournamentState? = null,
+    val roundIndex: Int? = null
 )

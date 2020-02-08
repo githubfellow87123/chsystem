@@ -14,6 +14,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import java.util.*
+import kotlin.collections.HashSet
 
 @RestController
 @RequestMapping("tournaments")
@@ -50,12 +51,18 @@ class TournamentController(
 
         return when (tournament.state) {
             TournamentState.INITIALIZING -> {
-                tournament.state = TournamentState.IN_PROGRESS
-                tournament.roundIndex = 1
-                val matchesForNextRound =
-                    matchmakingService.generateMatchesForRound(tournament.roundIndex, tournament.matches)
-                tournament.matches.addAll(matchesForNextRound)
-                tournament.toTournamentModel()
+                val matches = HashSet(tournament.matches)
+                val matchesForNextRound = matchmakingService.generateMatchesForRound(1, tournament.matches)
+                matches.addAll(matchesForNextRound)
+
+                val startedTournament = tournament.copy(
+                    roundIndex = 1,
+                    state = TournamentState.IN_PROGRESS,
+                    matches = matches
+                )
+
+                tournamentRepository.save(startedTournament)
+                startedTournament.toTournamentModel()
             }
             TournamentState.IN_PROGRESS -> tournament.toTournamentModel()
             TournamentState.DONE -> throw TournamentInWrongStateException("The tournament is already done and can not be started")
