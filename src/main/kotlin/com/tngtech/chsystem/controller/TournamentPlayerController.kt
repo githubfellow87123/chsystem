@@ -30,8 +30,7 @@ class TournamentPlayerController(
 
         val player = findPlayer(playerId)
 
-        val players = HashSet(tournament.players)
-        players.add(player)
+        val players = tournament.players.plus(player)
         val updatedTournament = tournament.copy(players = players)
         tournamentRepository.save(updatedTournament)
     }
@@ -50,8 +49,7 @@ class TournamentPlayerController(
         val player = findPlayer(playerId)
 
         if (tournament.players.contains(player)) {
-            val players = HashSet(tournament.players)
-            players.remove(player)
+            val players = tournament.players.minus(player)
             val updatedTournament = tournament.copy(players = players)
             tournamentRepository.save(updatedTournament)
         } else {
