@@ -145,9 +145,8 @@ internal class TournamentPlayerControllerUnitTest {
 
     @Test
     fun removePlayerFromTournament() {
-        val tournament = TournamentEntity()
         val player = PlayerEntity(name = "Alex")
-        tournament.players.add(player)
+        val tournament = TournamentEntity(players = setOf(player))
         val playerToTournamentModel = PlayerToTournamentModel(tournament.id, player.id)
         val tournamentSlot = slot<TournamentEntity>()
 

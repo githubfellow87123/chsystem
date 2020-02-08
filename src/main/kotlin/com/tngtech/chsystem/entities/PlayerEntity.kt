@@ -14,7 +14,7 @@ data class PlayerEntity(
     @Column(columnDefinition = "UUID")
     val id: UUID = UUID.randomUUID(),
     @Column(unique = true, nullable = false)
-    var name: String,
+    val name: String,
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now()
 )

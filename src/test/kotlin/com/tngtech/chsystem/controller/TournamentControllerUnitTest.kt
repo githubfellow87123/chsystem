@@ -75,16 +75,25 @@ internal class TournamentControllerUnitTest {
 
     @Test
     fun startTournament() {
-        val tournamentEntity = TournamentEntity()
+        val player1 = PlayerEntity(name = "Alex")
+        val player2 = PlayerEntity(name = "Bert")
+        val players = setOf(player1, player2)
+        val tournamentEntity = TournamentEntity(players = players)
         val match = MatchEntity(
             roundIndex = 1,
-            player1 = PlayerEntity(name = "Alex"),
-            player2 = PlayerEntity(name = "Bert"),
+            player1 = player1,
+            player2 = player2,
             tournament = tournamentEntity
         )
         val tournamentEntitySlot = slot<TournamentEntity>()
         every { tournamentRepository.findByIdOrNull(tournamentEntity.id) } returns tournamentEntity
-        every { matchmakingService.generateMatchesForRound(1, emptySet()) } returns setOf(match)
+        every {
+            matchmakingService.generateMatchesForRound(
+                1,
+                setOf(player1, player2),
+                emptySet()
+            )
+        } returns setOf(match)
         every { tournamentRepository.save(capture(tournamentEntitySlot)) } answers { tournamentEntitySlot.captured }
 
         val startedTournament = tournamentController.startTournament(tournamentEntity.id)

@@ -52,7 +52,8 @@ class TournamentController(
         return when (tournament.state) {
             TournamentState.INITIALIZING -> {
                 val matches = HashSet(tournament.matches)
-                val matchesForNextRound = matchmakingService.generateMatchesForRound(1, tournament.matches)
+                val matchesForNextRound =
+                    matchmakingService.generateMatchesForRound(1, tournament.players, tournament.matches)
                 matches.addAll(matchesForNextRound)
 
                 val startedTournament = tournament.copy(

@@ -67,17 +67,18 @@ class PlayerController(
 
         val playerEntityOptional = playerRepository.findById(id)
         val playerEntity: PlayerEntity
+        val updatedPlayerEntity: PlayerEntity
 
         if (playerEntityOptional.isPresent) {
             playerEntity = playerEntityOptional.get()
-            playerEntity.name = playerModel.name
+            updatedPlayerEntity = playerEntity.copy(name = playerModel.name)
         } else {
-            playerEntity = PlayerEntity(id = id, name = playerModel.name)
+            updatedPlayerEntity = PlayerEntity(id = id, name = playerModel.name)
         }
 
-        playerRepository.save(playerEntity)
+        playerRepository.save(updatedPlayerEntity)
 
-        return playerEntity.toPlayerModel()
+        return updatedPlayerEntity.toPlayerModel()
     }
 
     @DeleteMapping("{id}")

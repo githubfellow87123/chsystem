@@ -30,8 +30,10 @@ class TournamentPlayerController(
 
         val player = findPlayer(playerId)
 
-        tournament.players.add(player)
-        tournamentRepository.save(tournament)
+        val players = HashSet(tournament.players)
+        players.add(player)
+        val updatedTournament = tournament.copy(players = players)
+        tournamentRepository.save(updatedTournament)
     }
 
     @DeleteMapping("{playerId}")
@@ -48,8 +50,10 @@ class TournamentPlayerController(
         val player = findPlayer(playerId)
 
         if (tournament.players.contains(player)) {
-            tournament.players.remove(player)
-            tournamentRepository.save(tournament)
+            val players = HashSet(tournament.players)
+            players.remove(player)
+            val updatedTournament = tournament.copy(players = players)
+            tournamentRepository.save(updatedTournament)
         } else {
             throw PlayerNotAssignedToTournamentException("Player with id $playerId is not assigned to tournament with id $tournamentId")
         }
