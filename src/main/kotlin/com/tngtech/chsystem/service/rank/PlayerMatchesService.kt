@@ -7,7 +7,6 @@ import java.util.stream.Collectors
 
 @Service
 class PlayerMatchesService {
-    // TODO test this function
     fun mapPlayersToMatches(
         players: Set<PlayerEntity>,
         alreadyPlayedMatches: Set<PlayedMatch>
