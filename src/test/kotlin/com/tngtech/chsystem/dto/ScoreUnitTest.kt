@@ -1,4 +1,4 @@
-package com.tngtech.chsystem.service
+package com.tngtech.chsystem.dto
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

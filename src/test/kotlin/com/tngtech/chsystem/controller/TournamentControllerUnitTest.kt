@@ -6,7 +6,7 @@ import com.tngtech.chsystem.entities.PlayerEntity
 import com.tngtech.chsystem.entities.TournamentEntity
 import com.tngtech.chsystem.entities.TournamentState
 import com.tngtech.chsystem.model.TournamentModel
-import com.tngtech.chsystem.service.MatchmakingService
+import com.tngtech.chsystem.service.matchmaking.MatchmakingService
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK

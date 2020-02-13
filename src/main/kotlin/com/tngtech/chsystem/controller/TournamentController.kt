@@ -1,14 +1,10 @@
 package com.tngtech.chsystem.controller
 
 import com.tngtech.chsystem.dao.TournamentRepository
-import com.tngtech.chsystem.entities.MatchEntity
-import com.tngtech.chsystem.entities.PlayerEntity
 import com.tngtech.chsystem.entities.TournamentEntity
 import com.tngtech.chsystem.entities.TournamentState
-import com.tngtech.chsystem.model.MatchModel
-import com.tngtech.chsystem.model.PlayerModel
 import com.tngtech.chsystem.model.TournamentModel
-import com.tngtech.chsystem.service.MatchmakingService
+import com.tngtech.chsystem.service.matchmaking.MatchmakingService
 import mu.KotlinLogging
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -76,16 +72,9 @@ class TournamentController(
 
     // TODO add method to fetch a tournament
 
-    private fun TournamentModel.toTournamentEntity(): TournamentEntity {
-        return if (date == null) TournamentEntity() else TournamentEntity(date = date)
-    }
+    private fun TournamentModel.toTournamentEntity() = TournamentEntity(date = date)
 
     private fun TournamentEntity.toTournamentModel() = TournamentModel(id, date, state, roundIndex)
-
-    private fun MatchEntity.toMatchModel() =
-        MatchModel(id, roundIndex, player1.toPlayerModel(), player2.toPlayerModel())
-
-    private fun PlayerEntity.toPlayerModel() = PlayerModel(id = id, name = name)
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     class TournamentDoesNotExistException(tournamentId: UUID) :

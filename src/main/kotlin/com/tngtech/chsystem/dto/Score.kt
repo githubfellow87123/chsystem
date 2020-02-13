@@ -1,4 +1,4 @@
-package com.tngtech.chsystem.service
+package com.tngtech.chsystem.dto
 
 data class Score(
     val primaryScore: Int,
