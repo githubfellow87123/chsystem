@@ -3,12 +3,14 @@ package com.tngtech.chsystem.service.matchmaking
 import com.tngtech.chsystem.dto.PlayedMatch
 import com.tngtech.chsystem.entities.MatchEntity
 import com.tngtech.chsystem.entities.PlayerEntity
+import com.tngtech.chsystem.service.rank.PlayerMatchesService
 import com.tngtech.chsystem.service.rank.RankingService
 import org.springframework.stereotype.Service
 import java.util.stream.Collectors
 
 @Service
 class MatchmakingService(
+    private val playerMatchesService: PlayerMatchesService,
     private val rankingService: RankingService
 ) {
 
@@ -22,9 +24,9 @@ class MatchmakingService(
         val playedMatches: Set<PlayedMatch> = alreadyPlayedMatches.stream()
             .map { matchEntity -> matchEntity.toPlayedMatch() }
             .collect(Collectors.toSet())
+        val playerToMatches = playerMatchesService.mapPlayersToMatches(players, playedMatches)
 
-        // TODO use ranked players for creation of new matches
-        val rankedPlayers = rankingService.rankPlayers(players, playedMatches)
+        val rankedPlayers = rankingService.rankPlayers(playerToMatches)
 
         return emptySet()
     }
@@ -33,10 +35,10 @@ class MatchmakingService(
     fun playedVsAnother(
         player1: PlayerEntity,
         player2: PlayerEntity?,
-        alreadyPlayedMatches: Set<MatchEntity>
+        playerToMatches: Map<PlayerEntity, Set<PlayedMatch>>
     ): Boolean {
 
-        return alreadyPlayedMatches.stream()
+        return playerToMatches.getValue(player1).stream()
             .anyMatch { match ->
                 match.player1 == player1 && match.player2 == player2
                         || match.player1 == player2 && match.player2 == player1

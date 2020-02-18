@@ -20,9 +20,6 @@ internal class RankingServiceUnitTest {
     @MockK
     lateinit var scoreService: ScoreService
 
-    @MockK
-    lateinit var playerMatchesService: PlayerMatchesService
-
     private val random = Random()
 
     private lateinit var rankingService: RankingService
@@ -36,7 +33,7 @@ internal class RankingServiceUnitTest {
 
     @BeforeEach
     fun setUp() {
-        rankingService = RankingService(scoreService, playerMatchesService, random)
+        rankingService = RankingService(scoreService, random)
     }
 
     @Test
@@ -44,8 +41,6 @@ internal class RankingServiceUnitTest {
         val matchPlayer12 = PlayedMatch(UUID.randomUUID(), tournament, 1, player1, player2, 0, 2)
         val matchPlayer34 = PlayedMatch(UUID.randomUUID(), tournament, 1, player3, player4, 1, 2)
 
-        val players = setOf(player1, player2, player3, player4)
-        val alreadyPlayedMatches = setOf(matchPlayer12, matchPlayer34)
 
         val playerToMatches = mapOf(
             player1 to setOf(matchPlayer12),
@@ -53,7 +48,6 @@ internal class RankingServiceUnitTest {
             player3 to setOf(matchPlayer34),
             player4 to setOf(matchPlayer34)
         )
-        every { playerMatchesService.mapPlayersToMatches(players, alreadyPlayedMatches) } returns playerToMatches
         val playerToScores = mapOf(
             player1 to Score(0, 3.0, 0.0, 1.0),
             player2 to Score(3, 0.0, 1.0, 1.0),
@@ -62,7 +56,7 @@ internal class RankingServiceUnitTest {
         )
         every { scoreService.calculatePlayerScores(playerToMatches) } returns playerToScores
 
-        val playersOrderedByRank = rankingService.rankPlayers(players, alreadyPlayedMatches)
+        val playersOrderedByRank = rankingService.rankPlayers(playerToMatches)
 
         assertThat(playerToScores.getValue(player2)).isGreaterThan(playerToScores.getValue(player4))
         assertThat(playerToScores.getValue(player4)).isGreaterThan(playerToScores.getValue(player3))
@@ -75,11 +69,7 @@ internal class RankingServiceUnitTest {
 
     @Test
     fun `rankPlayers players with same score are shuffled sanity check`() {
-        val players = setOf(player1, player2)
-        val alreadyPlayedMatches: Set<PlayedMatch> = emptySet()
-
         val playerToMatches: Map<PlayerEntity, Set<PlayedMatch>> = mapOf(player1 to emptySet(), player2 to emptySet())
-        every { playerMatchesService.mapPlayersToMatches(players, alreadyPlayedMatches) } returns playerToMatches
         val scorePlayer13 = Score(0, 0.0, 0.0, 0.0)
         val scorePlayer24 = Score(3, 0.0, 0.0, 0.0)
         val playerToScores = mapOf(
@@ -92,16 +82,16 @@ internal class RankingServiceUnitTest {
 
         assertThat(scorePlayer24).isGreaterThan(scorePlayer13)
 
-        val rankingService1 = RankingService(scoreService, playerMatchesService, Random(1L))
-        val rankingService2 = RankingService(scoreService, playerMatchesService, Random(123743L))
+        val rankingService1 = RankingService(scoreService, Random(1L))
+        val rankingService2 = RankingService(scoreService, Random(123743L))
 
-        val playersOrderedByRank1 = rankingService1.rankPlayers(players, alreadyPlayedMatches)
+        val playersOrderedByRank1 = rankingService1.rankPlayers(playerToMatches)
         assertThat(playersOrderedByRank1[0]).isEqualTo(player2)
         assertThat(playersOrderedByRank1[1]).isEqualTo(player4)
         assertThat(playersOrderedByRank1[2]).isEqualTo(player3)
         assertThat(playersOrderedByRank1[3]).isEqualTo(player1)
 
-        val playersOrderedByRank2 = rankingService2.rankPlayers(players, alreadyPlayedMatches)
+        val playersOrderedByRank2 = rankingService2.rankPlayers(playerToMatches)
         assertThat(playersOrderedByRank2[0]).isEqualTo(player4)
         assertThat(playersOrderedByRank2[1]).isEqualTo(player2)
         assertThat(playersOrderedByRank2[2]).isEqualTo(player1)

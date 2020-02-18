@@ -10,13 +10,11 @@ import java.util.*
 @Service
 class RankingService(
     private val scoreService: ScoreService,
-    private val playerMatchesService: PlayerMatchesService,
     private val random: Random
 ) {
 
-    fun rankPlayers(players: Set<PlayerEntity>, alreadyPlayedMatches: Set<PlayedMatch>): List<PlayerEntity> {
+    fun rankPlayers(playerToMatches: Map<PlayerEntity, Set<PlayedMatch>>): List<PlayerEntity> {
 
-        val playerToMatches = playerMatchesService.mapPlayersToMatches(players, alreadyPlayedMatches)
         val playerToScore = scoreService.calculatePlayerScores(playerToMatches)
 
         return sortPlayers(playerToScore)
