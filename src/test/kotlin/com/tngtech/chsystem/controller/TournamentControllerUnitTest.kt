@@ -87,13 +87,7 @@ internal class TournamentControllerUnitTest {
         )
         val tournamentEntitySlot = slot<TournamentEntity>()
         every { tournamentRepository.findByIdOrNull(tournamentEntity.id) } returns tournamentEntity
-        every {
-            matchmakingService.generateMatchesForRound(
-                1,
-                setOf(player1, player2),
-                emptySet()
-            )
-        } returns setOf(match)
+        every { matchmakingService.generateMatchesForNextRound(tournamentEntity) } returns setOf(match)
         every { tournamentRepository.save(capture(tournamentEntitySlot)) } answers { tournamentEntitySlot.captured }
 
         val startedTournament = tournamentController.startTournament(tournamentEntity.id)
@@ -102,7 +96,6 @@ internal class TournamentControllerUnitTest {
         assertThat(startedTournament.roundIndex).isEqualTo(1)
         assertThat(tournamentEntitySlot.captured.state).isEqualTo(TournamentState.IN_PROGRESS)
         assertThat(tournamentEntitySlot.captured.roundIndex).isEqualTo(1)
-        assertThat(tournamentEntitySlot.captured.matches).containsExactly(match)
     }
 
     @Test

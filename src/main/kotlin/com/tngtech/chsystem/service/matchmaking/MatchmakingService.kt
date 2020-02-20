@@ -1,8 +1,9 @@
 package com.tngtech.chsystem.service.matchmaking
 
+import com.tngtech.chsystem.dao.MatchRepository
 import com.tngtech.chsystem.dto.PlayedMatch
 import com.tngtech.chsystem.entities.MatchEntity
-import com.tngtech.chsystem.entities.PlayerEntity
+import com.tngtech.chsystem.entities.TournamentEntity
 import com.tngtech.chsystem.service.rank.PlayerMatchesService
 import com.tngtech.chsystem.service.rank.RankingService
 import org.springframework.stereotype.Service
@@ -11,38 +12,34 @@ import java.util.stream.Collectors
 @Service
 class MatchmakingService(
     private val playerMatchesService: PlayerMatchesService,
-    private val rankingService: RankingService
+    private val rankingService: RankingService,
+    private val matchRepository: MatchRepository,
+    private val pairingService: PairingService
 ) {
 
-    // finish matchmaking implementation
-    fun generateMatchesForRound(
-        roundIndex: Int,
-        players: Set<PlayerEntity>,
-        alreadyPlayedMatches: Set<MatchEntity>
-    ): Set<MatchEntity> {
+    fun generateMatchesForNextRound(tournament: TournamentEntity): Set<MatchEntity>? {
 
-        val playedMatches: Set<PlayedMatch> = alreadyPlayedMatches.stream()
+        val playedMatches: Set<PlayedMatch> = tournament.matches.stream()
             .map { matchEntity -> matchEntity.toPlayedMatch() }
             .collect(Collectors.toSet())
-        val playerToMatches = playerMatchesService.mapPlayersToMatches(players, playedMatches)
-
+        val playerToMatches = playerMatchesService.mapPlayersToMatches(tournament.players, playedMatches)
         val rankedPlayers = rankingService.rankPlayers(playerToMatches)
-
-        return emptySet()
-    }
-    
-    // TODO use and test this function
-    fun playedVsAnother(
-        player1: PlayerEntity,
-        player2: PlayerEntity?,
-        playerToMatches: Map<PlayerEntity, Set<PlayedMatch>>
-    ): Boolean {
-
-        return playerToMatches.getValue(player1).stream()
-            .anyMatch { match ->
-                match.player1 == player1 && match.player2 == player2
-                        || match.player1 == player2 && match.player2 == player1
+        val pairings = pairingService.generatePairingsForNextRound(rankedPlayers, playerToMatches) ?: return null
+        val matches = pairings.stream()
+            .map { pair ->
+                MatchEntity(
+                    tournament = tournament,
+                    roundIndex = tournament.roundIndex + 1,
+                    player1 = rankedPlayers[pair.first],
+                    // The rank rankedPlayers.size is only used for the bye
+                    player2 = if (pair.second == rankedPlayers.size) null else rankedPlayers[pair.second]
+                )
             }
+            .collect(Collectors.toSet())
+
+        matchRepository.saveAll(matches)
+
+        return matches
     }
 
     private fun MatchEntity.toPlayedMatch(): PlayedMatch {

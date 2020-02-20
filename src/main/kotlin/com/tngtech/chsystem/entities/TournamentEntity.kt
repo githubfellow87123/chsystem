@@ -3,6 +3,7 @@ package com.tngtech.chsystem.entities
 import java.time.LocalDate
 import java.util.*
 import javax.persistence.*
+import kotlin.collections.HashSet
 
 @Entity
 @Table(name = "TOURNAMENT")
@@ -23,7 +24,8 @@ data class TournamentEntity(
         joinColumns = [JoinColumn(name = "TOURNAMENT_ID", referencedColumnName = "ID")],
         inverseJoinColumns = [JoinColumn(name = "PLAYER_ID", referencedColumnName = "ID")]
     )
-    val players: Set<PlayerEntity> = setOf(),
-    @OneToMany
-    val matches: Set<MatchEntity> = setOf()
-)
+    val players: Set<PlayerEntity> = setOf()
+) {
+    @OneToMany(mappedBy = "tournament")
+    val matches: MutableSet<MatchEntity> = HashSet()
+}

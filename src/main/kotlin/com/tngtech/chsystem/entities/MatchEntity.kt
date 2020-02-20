@@ -10,6 +10,7 @@ data class MatchEntity(
     @Column(columnDefinition = "UUID")
     val id: UUID = UUID.randomUUID(),
     @ManyToOne
+    @JoinColumn(name = "TOURNAMENT_ID", nullable = false, updatable = false)
     val tournament: TournamentEntity,
     @Column(nullable = false)
     val roundIndex: Int,

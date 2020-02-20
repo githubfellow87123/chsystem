@@ -10,7 +10,6 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import java.util.*
-import kotlin.collections.HashSet
 
 @RestController
 @RequestMapping("tournaments")
@@ -47,15 +46,12 @@ class TournamentController(
 
         return when (tournament.state) {
             TournamentState.INITIALIZING -> {
-                val matches = HashSet(tournament.matches)
-                val matchesForNextRound =
-                    matchmakingService.generateMatchesForRound(1, tournament.players, tournament.matches)
-                matches.addAll(matchesForNextRound)
+                matchmakingService.generateMatchesForNextRound(tournament)
+                    ?: throw UnableToGenerateMatchesException("It's not possible to generate matches for next round") // TODO test this case
 
                 val startedTournament = tournament.copy(
                     roundIndex = 1,
-                    state = TournamentState.IN_PROGRESS,
-                    matches = matches
+                    state = TournamentState.IN_PROGRESS
                 )
 
                 tournamentRepository.save(startedTournament)
@@ -82,4 +78,7 @@ class TournamentController(
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     class TournamentInWrongStateException(message: String) : RuntimeException(message)
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    class UnableToGenerateMatchesException(message: String) : RuntimeException(message)
 }
