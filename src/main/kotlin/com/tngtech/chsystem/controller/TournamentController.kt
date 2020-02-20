@@ -47,7 +47,7 @@ class TournamentController(
         return when (tournament.state) {
             TournamentState.INITIALIZING -> {
                 matchmakingService.generateMatchesForNextRound(tournament)
-                    ?: throw UnableToGenerateMatchesException("It's not possible to generate matches for next round") // TODO test this case
+                    ?: throw UnableToGenerateMatchesException("It's not possible to generate matches for next round")
 
                 val startedTournament = tournament.copy(
                     roundIndex = 1,

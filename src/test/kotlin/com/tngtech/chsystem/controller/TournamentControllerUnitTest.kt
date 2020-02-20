@@ -99,6 +99,18 @@ internal class TournamentControllerUnitTest {
     }
 
     @Test
+    fun `startTournament throws exception if matches can not be generated`() {
+        val tournamentEntity = TournamentEntity()
+
+        every { tournamentRepository.findByIdOrNull(tournamentEntity.id) } returns tournamentEntity
+        every { matchmakingService.generateMatchesForNextRound(tournamentEntity) } returns null
+
+        assertFailsWith<TournamentController.UnableToGenerateMatchesException> {
+            tournamentController.startTournament(tournamentEntity.id)
+        }
+    }
+
+    @Test
     fun `startTournament throws exception if tournament doesn't exist`() {
 
         val tournamentEntity = TournamentEntity()
