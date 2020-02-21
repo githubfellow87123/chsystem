@@ -17,14 +17,19 @@ class MatchmakingService(
     private val pairingService: PairingService
 ) {
 
-    fun generateMatchesForNextRound(tournament: TournamentEntity): Set<MatchEntity>? {
+    fun generateMatchesForNextRound(tournament: TournamentEntity): MatchmakingCode {
 
-        val playedMatches: Set<PlayedMatch> = tournament.matches.stream()
-            .map { matchEntity -> matchEntity.toPlayedMatch() }
-            .collect(Collectors.toSet())
+        val playedMatches = HashSet<PlayedMatch>()
+        for (match in tournament.matches) {
+            val playedMatch = match.toPlayedMatch()
+                ?: return MatchmakingCode.MISSING_RESULTS_OF_CURRENT_ROUND
+            playedMatches.add(playedMatch)
+        }
+
         val playerToMatches = playerMatchesService.mapPlayersToMatches(tournament.players, playedMatches)
         val rankedPlayers = rankingService.rankPlayers(playerToMatches)
-        val pairings = pairingService.generatePairingsForNextRound(rankedPlayers, playerToMatches) ?: return null
+        val pairings = pairingService.generatePairingsForNextRound(rankedPlayers, playerToMatches)
+            ?: return MatchmakingCode.NO_VALID_MATCHES_FOR_NEXT_ROUND_AVAILABLE
         val matches = pairings.stream()
             .map { pair ->
                 MatchEntity(
@@ -39,12 +44,14 @@ class MatchmakingService(
 
         matchRepository.saveAll(matches)
 
-        return matches
+        return MatchmakingCode.SUCCESSFUL
     }
 
-    private fun MatchEntity.toPlayedMatch(): PlayedMatch {
-        if (winsPlayer1 == null || winsPlayer2 == null) {
-            throw RuntimeException("Match $this is was not played, results are missing")
+    private fun MatchEntity.toPlayedMatch(): PlayedMatch? {
+        val winsPlayer1Val = winsPlayer1
+        val winsPlayer2Val = winsPlayer2
+        if (winsPlayer1Val == null || winsPlayer2Val == null) {
+            return null
         }
 
         return PlayedMatch(
@@ -53,8 +60,8 @@ class MatchmakingService(
             roundIndex,
             player1,
             player2,
-            winsPlayer1!!,
-            winsPlayer2!!
+            winsPlayer1Val,
+            winsPlayer2Val
         )
     }
 }

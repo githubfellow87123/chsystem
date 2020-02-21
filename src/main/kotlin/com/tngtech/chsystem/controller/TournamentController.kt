@@ -4,6 +4,7 @@ import com.tngtech.chsystem.dao.TournamentRepository
 import com.tngtech.chsystem.entities.TournamentEntity
 import com.tngtech.chsystem.entities.TournamentState
 import com.tngtech.chsystem.model.TournamentModel
+import com.tngtech.chsystem.service.matchmaking.MatchmakingCode
 import com.tngtech.chsystem.service.matchmaking.MatchmakingService
 import mu.KotlinLogging
 import org.springframework.data.repository.findByIdOrNull
@@ -46,8 +47,14 @@ class TournamentController(
 
         return when (tournament.state) {
             TournamentState.INITIALIZING -> {
-                matchmakingService.generateMatchesForNextRound(tournament)
-                    ?: throw UnableToGenerateMatchesException("It's not possible to generate matches for next round")
+
+                when (matchmakingService.generateMatchesForNextRound(tournament)) {
+                    MatchmakingCode.SUCCESSFUL -> logger.info { "Generated matches for next round successful, tournament $tournamentId" }
+                    MatchmakingCode.MISSING_RESULTS_OF_CURRENT_ROUND -> throw UnableToGenerateMatchesException("Results of current round missing")
+                    MatchmakingCode.NO_VALID_MATCHES_FOR_NEXT_ROUND_AVAILABLE -> throw UnableToGenerateMatchesException(
+                        "It's not possible to generate matches for next round"
+                    )
+                }
 
                 val startedTournament = tournament.copy(
                     roundIndex = 1,

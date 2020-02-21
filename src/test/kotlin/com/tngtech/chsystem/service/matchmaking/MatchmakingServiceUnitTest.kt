@@ -59,15 +59,16 @@ internal class MatchmakingServiceUnitTest {
             matchesForNextRoundSlot.captured
         }
 
-        val matchesOfNextRound = matchmakingService.generateMatchesForNextRound(tournament)
+        val code = matchmakingService.generateMatchesForNextRound(tournament)
+        val matchesOfNextRound = matchesForNextRoundSlot.captured
 
-        assertThat(matchesOfNextRound).isEqualTo(matchesForNextRoundSlot.captured)
+        assertThat(code).isEqualTo(MatchmakingCode.SUCCESSFUL)
         assertThat(matchesOfNextRound).hasSize(1)
-        assertThat(matchesOfNextRound!!.first().player1).isEqualTo(player1)
-        assertThat(matchesOfNextRound!!.first().player2).isEqualTo(player2)
-        assertThat(matchesOfNextRound!!.first().winsPlayer1).isNull()
-        assertThat(matchesOfNextRound!!.first().winsPlayer2).isNull()
-        assertThat(matchesOfNextRound!!.first().roundIndex).isEqualTo(tournament.roundIndex + 1)
+        assertThat(matchesOfNextRound.first().player1).isEqualTo(player1)
+        assertThat(matchesOfNextRound.first().player2).isEqualTo(player2)
+        assertThat(matchesOfNextRound.first().winsPlayer1).isNull()
+        assertThat(matchesOfNextRound.first().winsPlayer2).isNull()
+        assertThat(matchesOfNextRound.first().roundIndex).isEqualTo(tournament.roundIndex + 1)
     }
 
     @Test
@@ -88,14 +89,44 @@ internal class MatchmakingServiceUnitTest {
             matchesForNextRoundSlot.captured
         }
 
-        val matchesOfNextRound = matchmakingService.generateMatchesForNextRound(tournament)
+        val code = matchmakingService.generateMatchesForNextRound(tournament)
+        val matchesOfNextRound = matchesForNextRoundSlot.captured
 
-        assertThat(matchesOfNextRound).isEqualTo(matchesForNextRoundSlot.captured)
+        assertThat(code).isEqualTo(MatchmakingCode.SUCCESSFUL)
         assertThat(matchesOfNextRound).hasSize(1)
-        assertThat(matchesOfNextRound!!.first().player1).isEqualTo(player1)
-        assertThat(matchesOfNextRound!!.first().player2).isNull()
-        assertThat(matchesOfNextRound!!.first().winsPlayer1).isNull()
-        assertThat(matchesOfNextRound!!.first().winsPlayer2).isNull()
-        assertThat(matchesOfNextRound!!.first().roundIndex).isEqualTo(tournament.roundIndex + 1)
+        assertThat(matchesOfNextRound.first().player1).isEqualTo(player1)
+        assertThat(matchesOfNextRound.first().player2).isNull()
+        assertThat(matchesOfNextRound.first().winsPlayer1).isNull()
+        assertThat(matchesOfNextRound.first().winsPlayer2).isNull()
+        assertThat(matchesOfNextRound.first().roundIndex).isEqualTo(tournament.roundIndex + 1)
+    }
+
+    @Test
+    fun `generateMatchesForNextRound missing result of current round`() {
+
+        val tournament = tournament.copy()
+        val matchMissingResult = MatchEntity(UUID.randomUUID(), tournament, 1, player1, player2)
+        tournament.matches.add(matchMissingResult)
+
+        val code = matchmakingService.generateMatchesForNextRound(tournament)
+
+        assertThat(code).isEqualTo(MatchmakingCode.MISSING_RESULTS_OF_CURRENT_ROUND)
+    }
+
+    @Test
+    fun `generateMatchesForNextRound no valid matchmaking possible for next round`() {
+
+        val tournament = tournament.copy()
+        tournament.matches.add(match)
+        val playerToMatches = HashMap<PlayerEntity, Set<PlayedMatch>>()
+        val rankedPlayers = listOf(player1, player2)
+
+        every { playerMatchesService.mapPlayersToMatches(tournament.players, any()) } returns playerToMatches
+        every { rankingService.rankPlayers(playerToMatches) } returns rankedPlayers
+        every { pairingService.generatePairingsForNextRound(rankedPlayers, playerToMatches) } returns null
+
+        val code = matchmakingService.generateMatchesForNextRound(tournament)
+
+        assertThat(code).isEqualTo(MatchmakingCode.NO_VALID_MATCHES_FOR_NEXT_ROUND_AVAILABLE)
     }
 }
