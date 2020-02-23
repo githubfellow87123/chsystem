@@ -47,17 +47,7 @@ class TournamentController(
 
         return when (tournament.state) {
             TournamentState.INITIALIZING -> {
-
-                when (matchmakingService.generateMatchesForNextRound(tournament)) {
-                    MatchmakingCode.SUCCESSFUL -> logger.info { "Generated matches for next round successful, tournament $tournamentId" }
-                    MatchmakingCode.MISSING_RESULTS_OF_CURRENT_ROUND -> throw UnableToGenerateMatchesException("Results of current round missing")
-                    MatchmakingCode.NO_VALID_MATCHES_FOR_NEXT_ROUND_AVAILABLE -> throw UnableToGenerateMatchesException(
-                        "It's not possible to generate matches for next round"
-                    )
-                }
-
                 val startedTournament = tournament.copy(
-                    roundIndex = 1,
                     state = TournamentState.IN_PROGRESS
                 )
 
@@ -69,7 +59,34 @@ class TournamentController(
         }
     }
 
-    // TODO add method to switch over to the next round in a tournament
+    @PostMapping("{tournamentId}/nextRound")
+    fun nextRoundOfTournament(@PathVariable tournamentId: UUID): TournamentModel {
+
+        val tournament = tournamentRepository.findByIdOrNull(tournamentId)
+            ?: throw TournamentDoesNotExistException(tournamentId)
+
+        return when (tournament.state) {
+            TournamentState.INITIALIZING -> throw TournamentInWrongStateException("The tournament is not started, start the tournament to continue to the next round")
+            TournamentState.IN_PROGRESS -> {
+
+                when (matchmakingService.generateMatchesForNextRound(tournament)) {
+                    MatchmakingCode.SUCCESSFUL -> logger.info { "Generated matches for next round successfully, tournament $tournamentId" }
+                    MatchmakingCode.MISSING_RESULTS_OF_CURRENT_ROUND -> throw UnableToGenerateMatchesException("Results of current round missing")
+                    MatchmakingCode.NO_VALID_MATCHES_FOR_NEXT_ROUND_AVAILABLE -> throw UnableToGenerateMatchesException(
+                        "It's not possible to generate matches for next round"
+                    )
+                }
+
+                val startedTournament = tournament.copy(
+                    roundIndex = tournament.roundIndex + 1
+                )
+
+                tournamentRepository.save(startedTournament)
+                startedTournament.toTournamentModel()
+            }
+            TournamentState.DONE -> throw TournamentInWrongStateException("The tournament is already done, can't create an other round")
+        }
+    }
 
     // TODO add method to finish a tournament
 

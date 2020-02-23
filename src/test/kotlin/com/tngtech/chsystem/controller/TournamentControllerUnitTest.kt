@@ -82,39 +82,14 @@ internal class TournamentControllerUnitTest {
 
         val tournamentEntitySlot = slot<TournamentEntity>()
         every { tournamentRepository.findByIdOrNull(tournamentEntity.id) } returns tournamentEntity
-        every { matchmakingService.generateMatchesForNextRound(tournamentEntity) } returns MatchmakingCode.SUCCESSFUL
         every { tournamentRepository.save(capture(tournamentEntitySlot)) } answers { tournamentEntitySlot.captured }
 
         val startedTournament = tournamentController.startTournament(tournamentEntity.id)
 
         assertThat(startedTournament.state).isEqualTo(TournamentState.IN_PROGRESS)
-        assertThat(startedTournament.roundIndex).isEqualTo(1)
+        assertThat(startedTournament.roundIndex).isEqualTo(0)
         assertThat(tournamentEntitySlot.captured.state).isEqualTo(TournamentState.IN_PROGRESS)
-        assertThat(tournamentEntitySlot.captured.roundIndex).isEqualTo(1)
-    }
-
-    @Test
-    fun `startTournament throws exception if matches can not be generated`() {
-        val tournamentEntity = TournamentEntity()
-
-        every { tournamentRepository.findByIdOrNull(tournamentEntity.id) } returns tournamentEntity
-        every { matchmakingService.generateMatchesForNextRound(tournamentEntity) } returns MatchmakingCode.NO_VALID_MATCHES_FOR_NEXT_ROUND_AVAILABLE
-
-        assertFailsWith<TournamentController.UnableToGenerateMatchesException> {
-            tournamentController.startTournament(tournamentEntity.id)
-        }
-    }
-
-    @Test
-    fun `startTournament throws exception if results of current round were not entered`() {
-        val tournamentEntity = TournamentEntity()
-
-        every { tournamentRepository.findByIdOrNull(tournamentEntity.id) } returns tournamentEntity
-        every { matchmakingService.generateMatchesForNextRound(tournamentEntity) } returns MatchmakingCode.MISSING_RESULTS_OF_CURRENT_ROUND
-
-        assertFailsWith<TournamentController.UnableToGenerateMatchesException> {
-            tournamentController.startTournament(tournamentEntity.id)
-        }
+        assertThat(tournamentEntitySlot.captured.roundIndex).isEqualTo(0)
     }
 
     @Test
@@ -138,6 +113,85 @@ internal class TournamentControllerUnitTest {
 
         assertFailsWith<TournamentController.TournamentInWrongStateException> {
             tournamentController.startTournament(
+                tournamentEntity.id
+            )
+        }
+    }
+
+    @Test
+    fun nextRoundOfTournament() {
+
+        val tournamentEntity = TournamentEntity(state = TournamentState.IN_PROGRESS, roundIndex = 1)
+        val tournamentEntitySlot = slot<TournamentEntity>()
+
+        every { tournamentRepository.findByIdOrNull(tournamentEntity.id) } returns tournamentEntity
+        every { matchmakingService.generateMatchesForNextRound(tournamentEntity) } returns MatchmakingCode.SUCCESSFUL
+        every { tournamentRepository.save(capture(tournamentEntitySlot)) } answers { tournamentEntitySlot.captured }
+
+        val tournamentModel = tournamentController.nextRoundOfTournament(tournamentEntity.id)
+
+        assertThat(tournamentModel.roundIndex).isEqualTo(2)
+        assertThat(tournamentEntitySlot.captured.roundIndex).isEqualTo(2)
+    }
+
+    @Test
+    fun `nextRoundOfTournament throws exception if tournament doesn't exist`() {
+
+        val tournamentEntity = TournamentEntity()
+        every { tournamentRepository.findByIdOrNull(tournamentEntity.id) } returns null
+
+        assertFailsWith<TournamentController.TournamentDoesNotExistException> {
+            tournamentController.nextRoundOfTournament(
+                tournamentEntity.id
+            )
+        }
+    }
+
+    @Test
+    fun `nextRoundOfTournament throws exception if matches can not be generated`() {
+        val tournamentEntity = TournamentEntity(state = TournamentState.IN_PROGRESS)
+
+        every { tournamentRepository.findByIdOrNull(tournamentEntity.id) } returns tournamentEntity
+        every { matchmakingService.generateMatchesForNextRound(tournamentEntity) } returns MatchmakingCode.NO_VALID_MATCHES_FOR_NEXT_ROUND_AVAILABLE
+
+        assertFailsWith<TournamentController.UnableToGenerateMatchesException> {
+            tournamentController.nextRoundOfTournament(tournamentEntity.id)
+        }
+    }
+
+    @Test
+    fun `nextRoundOfTournament throws exception if results of current round were not entered`() {
+        val tournamentEntity = TournamentEntity(state = TournamentState.IN_PROGRESS)
+
+        every { tournamentRepository.findByIdOrNull(tournamentEntity.id) } returns tournamentEntity
+        every { matchmakingService.generateMatchesForNextRound(tournamentEntity) } returns MatchmakingCode.MISSING_RESULTS_OF_CURRENT_ROUND
+
+        assertFailsWith<TournamentController.UnableToGenerateMatchesException> {
+            tournamentController.nextRoundOfTournament(tournamentEntity.id)
+        }
+    }
+
+    @Test
+    fun `nextRoundOfTournament throws exception if tournament is already finished`() {
+
+        val tournamentEntity = TournamentEntity(state = TournamentState.DONE)
+        every { tournamentRepository.findByIdOrNull(tournamentEntity.id) } returns tournamentEntity
+
+        assertFailsWith<TournamentController.TournamentInWrongStateException> {
+            tournamentController.nextRoundOfTournament(
+                tournamentEntity.id
+            )
+        }
+    }
+
+    @Test
+    fun `nextRoundOfTournament throws exception if tournament has not started`() {
+
+        val tournamentEntity = TournamentEntity(state = TournamentState.INITIALIZING)
+        every { tournamentRepository.findByIdOrNull(tournamentEntity.id) } returns tournamentEntity
+
+        assertFailsWith<TournamentController.TournamentInWrongStateException> {
+            tournamentController.nextRoundOfTournament(
                 tournamentEntity.id
             )
         }
