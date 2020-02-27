@@ -97,7 +97,7 @@ class TournamentController(
             ?: throw TournamentDoesNotExistException(tournamentId)
 
         if (matchService.isResultMissing(tournament.matches)) {
-            throw UnableToFinishTournamentException("Results of one or more matches are missing")
+            throw UnableToFinishTournamentException("Result of one or more matches are missing")
         }
 
         return when (tournament.state) {
