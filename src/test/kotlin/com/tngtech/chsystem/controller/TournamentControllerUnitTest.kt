@@ -5,6 +5,7 @@ import com.tngtech.chsystem.entities.PlayerEntity
 import com.tngtech.chsystem.entities.TournamentEntity
 import com.tngtech.chsystem.entities.TournamentState
 import com.tngtech.chsystem.model.TournamentModel
+import com.tngtech.chsystem.service.match.MatchService
 import com.tngtech.chsystem.service.matchmaking.MatchmakingCode
 import com.tngtech.chsystem.service.matchmaking.MatchmakingService
 import io.mockk.every
@@ -28,6 +29,9 @@ internal class TournamentControllerUnitTest {
 
     @MockK
     lateinit var matchmakingService: MatchmakingService
+
+    @MockK
+    lateinit var matchService: MatchService
 
     @InjectMockKs
     lateinit var tournamentController: TournamentController
@@ -195,5 +199,85 @@ internal class TournamentControllerUnitTest {
                 tournamentEntity.id
             )
         }
+    }
+
+    @Test
+    fun finishTournament() {
+
+        val tournamentEntity = TournamentEntity(state = TournamentState.IN_PROGRESS)
+        val savedTournamentSlot = slot<TournamentEntity>()
+        every { tournamentRepository.findByIdOrNull(tournamentEntity.id) } returns tournamentEntity
+        every { matchService.isResultMissing(tournamentEntity.matches) } returns false
+        every { tournamentRepository.save(capture(savedTournamentSlot)) } answers {
+            savedTournamentSlot.captured
+        }
+
+
+        val finishedTournament = tournamentController.finishTournament(tournamentEntity.id)
+
+        verify { tournamentRepository.save(savedTournamentSlot.captured) }
+        assertThat(savedTournamentSlot.captured.state).isEqualTo(TournamentState.DONE)
+        assertThat(finishedTournament.state).isEqualTo(TournamentState.DONE)
+    }
+
+    @Test
+    fun `finishTournament throws exception when not all matches have results`() {
+
+        val tournamentEntity = TournamentEntity(state = TournamentState.IN_PROGRESS)
+        every { tournamentRepository.findByIdOrNull(tournamentEntity.id) } returns tournamentEntity
+        every { matchService.isResultMissing(tournamentEntity.matches) } returns true
+
+        assertFailsWith<TournamentController.UnableToFinishTournamentException> {
+            tournamentController.finishTournament(
+                tournamentEntity.id
+            )
+        }
+        verify(exactly = 0) { tournamentRepository.save(any<TournamentEntity>()) }
+    }
+
+    @Test
+    fun `finishTournament throws exception when tournament doesn't exist`() {
+
+        val tournamentEntity = TournamentEntity(state = TournamentState.IN_PROGRESS)
+        every { tournamentRepository.findByIdOrNull(tournamentEntity.id) } returns null
+
+        assertFailsWith<TournamentController.TournamentDoesNotExistException> {
+            tournamentController.finishTournament(
+                tournamentEntity.id
+            )
+        }
+        verify(exactly = 0) { tournamentRepository.save(any<TournamentEntity>()) }
+    }
+
+    @Test
+    fun `finishTournament throws exception when tournament is in wrong state`() {
+
+        val tournamentEntity = TournamentEntity(state = TournamentState.INITIALIZING)
+        val savedTournamentSlot = slot<TournamentEntity>()
+        every { tournamentRepository.findByIdOrNull(tournamentEntity.id) } returns tournamentEntity
+        every { matchService.isResultMissing(tournamentEntity.matches) } returns false
+        every { tournamentRepository.save(capture(savedTournamentSlot)) } answers {
+            savedTournamentSlot.captured
+        }
+
+        assertFailsWith<TournamentController.TournamentInWrongStateException> {
+            tournamentController.finishTournament(
+                tournamentEntity.id
+            )
+        }
+        verify(exactly = 0) { tournamentRepository.save(any<TournamentEntity>()) }
+    }
+
+    @Test
+    fun `finishTournament tournament can be finished twice`() {
+
+        val tournamentEntity = TournamentEntity(state = TournamentState.DONE)
+        every { tournamentRepository.findByIdOrNull(tournamentEntity.id) } returns tournamentEntity
+        every { matchService.isResultMissing(tournamentEntity.matches) } returns false
+
+        val finishedTournament = tournamentController.finishTournament(tournamentEntity.id)
+
+        verify(exactly = 0) { tournamentRepository.save(any<TournamentEntity>()) }
+        assertThat(finishedTournament.state).isEqualTo(TournamentState.DONE)
     }
 }

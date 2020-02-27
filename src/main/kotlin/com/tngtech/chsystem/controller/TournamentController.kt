@@ -4,6 +4,7 @@ import com.tngtech.chsystem.dao.TournamentRepository
 import com.tngtech.chsystem.entities.TournamentEntity
 import com.tngtech.chsystem.entities.TournamentState
 import com.tngtech.chsystem.model.TournamentModel
+import com.tngtech.chsystem.service.match.MatchService
 import com.tngtech.chsystem.service.matchmaking.MatchmakingCode
 import com.tngtech.chsystem.service.matchmaking.MatchmakingService
 import mu.KotlinLogging
@@ -16,7 +17,8 @@ import java.util.*
 @RequestMapping("tournaments")
 class TournamentController(
     private val tournamentRepository: TournamentRepository,
-    private val matchmakingService: MatchmakingService
+    private val matchmakingService: MatchmakingService,
+    private val matchService: MatchService
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -88,7 +90,29 @@ class TournamentController(
         }
     }
 
-    // TODO add method to finish a tournament
+    @PutMapping("{tournamentId}/finish")
+    fun finishTournament(@PathVariable tournamentId: UUID): TournamentModel {
+
+        val tournament = tournamentRepository.findByIdOrNull(tournamentId)
+            ?: throw TournamentDoesNotExistException(tournamentId)
+
+        if (matchService.isResultMissing(tournament.matches)) {
+            throw UnableToFinishTournamentException("Results of one or more matches are missing")
+        }
+
+        return when (tournament.state) {
+            TournamentState.INITIALIZING -> throw TournamentInWrongStateException("The tournament needs to be started before finishing it")
+            TournamentState.IN_PROGRESS -> {
+                val finishedTournament = tournament.copy(
+                    state = TournamentState.DONE
+                )
+
+                tournamentRepository.save(finishedTournament)
+                finishedTournament.toTournamentModel()
+            }
+            TournamentState.DONE -> tournament.toTournamentModel()
+        }
+    }
 
     // TODO add method to fetch a tournament
 
@@ -105,4 +129,7 @@ class TournamentController(
 
     @ResponseStatus(HttpStatus.CONFLICT)
     class UnableToGenerateMatchesException(message: String) : RuntimeException(message)
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    class UnableToFinishTournamentException(message: String) : RuntimeException(message)
 }

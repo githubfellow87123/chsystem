@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service
 @Service
 class MatchService {
 
+    fun isResultMissing(matchEntities: Set<MatchEntity>): Boolean {
+        return convertToPlayedMatches(matchEntities) == null
+    }
+
     fun convertToPlayedMatches(matchEntities: Set<MatchEntity>): Set<PlayedMatch>? {
 
         val playedMatches = HashSet<PlayedMatch>()
