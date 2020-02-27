@@ -1,9 +1,9 @@
 package com.tngtech.chsystem.service.matchmaking
 
 import com.tngtech.chsystem.dao.MatchRepository
-import com.tngtech.chsystem.dto.PlayedMatch
 import com.tngtech.chsystem.entities.MatchEntity
 import com.tngtech.chsystem.entities.TournamentEntity
+import com.tngtech.chsystem.service.match.MatchService
 import com.tngtech.chsystem.service.rank.PlayerMatchesService
 import com.tngtech.chsystem.service.rank.RankingService
 import org.springframework.stereotype.Service
@@ -14,18 +14,14 @@ class MatchmakingService(
     private val playerMatchesService: PlayerMatchesService,
     private val rankingService: RankingService,
     private val matchRepository: MatchRepository,
-    private val pairingService: PairingService
+    private val pairingService: PairingService,
+    private val matchService: MatchService
 ) {
 
     fun generateMatchesForNextRound(tournament: TournamentEntity): MatchmakingCode {
 
-        val playedMatches = HashSet<PlayedMatch>()
-        for (match in tournament.matches) {
-            val playedMatch = match.toPlayedMatch()
-                ?: return MatchmakingCode.MISSING_RESULTS_OF_CURRENT_ROUND
-            playedMatches.add(playedMatch)
-        }
-
+        val playedMatches = matchService.convertToPlayedMatches(tournament.matches)
+            ?: return MatchmakingCode.MISSING_RESULTS_OF_CURRENT_ROUND
         val playerToMatches = playerMatchesService.mapPlayersToMatches(tournament.players, playedMatches)
         val rankedPlayers = rankingService.rankPlayers(playerToMatches)
         val pairings = pairingService.generatePairingsForNextRound(rankedPlayers, playerToMatches)
@@ -47,21 +43,5 @@ class MatchmakingService(
         return MatchmakingCode.SUCCESSFUL
     }
 
-    private fun MatchEntity.toPlayedMatch(): PlayedMatch? {
-        val winsPlayer1Val = winsPlayer1
-        val winsPlayer2Val = winsPlayer2
-        if (winsPlayer1Val == null || winsPlayer2Val == null) {
-            return null
-        }
 
-        return PlayedMatch(
-            id,
-            tournament,
-            roundIndex,
-            player1,
-            player2,
-            winsPlayer1Val,
-            winsPlayer2Val
-        )
-    }
 }
