@@ -22,7 +22,7 @@ class MatchmakingService(
 
         val playedMatches = matchService.convertToPlayedMatches(tournament.matches)
             ?: return MatchmakingCode.MISSING_RESULTS_OF_CURRENT_ROUND
-        val playerToMatches = playerMatchesService.mapPlayersToMatches(tournament.players, playedMatches)
+        val playerToMatches = playerMatchesService.mapPlayersToMatches(tournament.getPlayers(), playedMatches)
         val rankedPlayers = rankingService.rankPlayers(playerToMatches)
         val pairings = pairingService.generatePairingsForNextRound(rankedPlayers, playerToMatches)
             ?: return MatchmakingCode.NO_VALID_MATCHES_FOR_NEXT_ROUND_AVAILABLE

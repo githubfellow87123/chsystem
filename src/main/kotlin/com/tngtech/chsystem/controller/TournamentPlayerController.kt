@@ -30,8 +30,8 @@ class TournamentPlayerController(
 
         val player = findPlayer(playerId)
 
-        val players = tournament.players.plus(player)
-        val updatedTournament = tournament.copy(players = players)
+        val updatedTournament = tournament.copy()
+        updatedTournament.addPlayer(player)
         tournamentRepository.save(updatedTournament)
     }
 
@@ -48,9 +48,9 @@ class TournamentPlayerController(
 
         val player = findPlayer(playerId)
 
-        if (tournament.players.contains(player)) {
-            val players = tournament.players.minus(player)
-            val updatedTournament = tournament.copy(players = players)
+        if (tournament.getPlayers().contains(player)) {
+            val updatedTournament = tournament.copy()
+            updatedTournament.removePlayer(player)
             tournamentRepository.save(updatedTournament)
         } else {
             throw PlayerNotAssignedToTournamentException("Player with id $playerId is not assigned to tournament with id $tournamentId")

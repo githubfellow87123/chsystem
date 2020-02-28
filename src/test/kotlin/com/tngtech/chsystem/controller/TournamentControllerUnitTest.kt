@@ -81,8 +81,9 @@ internal class TournamentControllerUnitTest {
     fun startTournament() {
         val player1 = PlayerEntity(name = "Alex")
         val player2 = PlayerEntity(name = "Bert")
-        val players = setOf(player1, player2)
-        val tournamentEntity = TournamentEntity(players = players)
+        val tournamentEntity = TournamentEntity()
+        tournamentEntity.addPlayer(player1)
+        tournamentEntity.addPlayer(player2)
 
         val tournamentEntitySlot = slot<TournamentEntity>()
         every { tournamentRepository.findByIdOrNull(tournamentEntity.id) } returns tournamentEntity

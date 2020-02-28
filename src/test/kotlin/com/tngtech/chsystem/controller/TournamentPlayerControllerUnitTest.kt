@@ -53,7 +53,7 @@ internal class TournamentPlayerControllerUnitTest {
             playerToTournamentModel
         )
 
-        assertThat(tournamentSlot.captured.players).containsExactly(player)
+        assertThat(tournamentSlot.captured.getPlayers()).containsExactly(player)
     }
 
     @Test
@@ -146,7 +146,8 @@ internal class TournamentPlayerControllerUnitTest {
     @Test
     fun removePlayerFromTournament() {
         val player = PlayerEntity(name = "Alex")
-        val tournament = TournamentEntity(players = setOf(player))
+        val tournament = TournamentEntity()
+        tournament.addPlayer(player)
         val playerToTournamentModel = PlayerToTournamentModel(tournament.id, player.id)
         val tournamentSlot = slot<TournamentEntity>()
 
@@ -164,7 +165,7 @@ internal class TournamentPlayerControllerUnitTest {
             playerToTournamentModel
         )
 
-        assertThat(tournamentSlot.captured.players).isEmpty()
+        assertThat(tournamentSlot.captured.getPlayers()).isEmpty()
     }
 
     @Test

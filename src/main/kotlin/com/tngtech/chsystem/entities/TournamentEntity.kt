@@ -2,6 +2,7 @@ package com.tngtech.chsystem.entities
 
 import java.time.LocalDate
 import java.util.*
+import java.util.stream.Collectors
 import javax.persistence.*
 import kotlin.collections.HashSet
 
@@ -18,14 +19,23 @@ data class TournamentEntity(
     val state: TournamentState = TournamentState.INITIALIZING,
     @Column
     val roundIndex: Int = 0,
-    @ManyToMany
-    @JoinTable(
-        name = "TOURNAMENT_PLAYERS",
-        joinColumns = [JoinColumn(name = "TOURNAMENT_ID", referencedColumnName = "ID")],
-        inverseJoinColumns = [JoinColumn(name = "PLAYER_ID", referencedColumnName = "ID")]
-    )
-    val players: Set<PlayerEntity> = setOf()
+    @OneToMany(mappedBy = "tournamentEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val tournamentPlayers: MutableSet<TournamentPlayerEntity> = HashSet()
 ) {
     @OneToMany(mappedBy = "tournament")
     val matches: MutableSet<MatchEntity> = HashSet()
+
+    fun getPlayers(): Set<PlayerEntity> {
+        return tournamentPlayers.stream().map { p -> p.playerEntity }.collect(Collectors.toSet())
+    }
+
+    fun addPlayer(player: PlayerEntity) {
+        val tournamentPlayerEntity = TournamentPlayerEntity(this, player)
+        tournamentPlayers.add(tournamentPlayerEntity)
+    }
+
+    fun removePlayer(player: PlayerEntity) {
+        val tournamentPlayerEntity = TournamentPlayerEntity(this, player)
+        tournamentPlayers.remove(tournamentPlayerEntity)
+    }
 }
