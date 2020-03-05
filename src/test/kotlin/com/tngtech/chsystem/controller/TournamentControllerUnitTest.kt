@@ -8,6 +8,7 @@ import com.tngtech.chsystem.model.TournamentModel
 import com.tngtech.chsystem.service.match.MatchService
 import com.tngtech.chsystem.service.matchmaking.MatchmakingCode
 import com.tngtech.chsystem.service.matchmaking.MatchmakingService
+import com.tngtech.chsystem.service.rank.RankingService
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -33,8 +34,16 @@ internal class TournamentControllerUnitTest {
     @MockK
     lateinit var matchService: MatchService
 
+    @MockK
+    lateinit var rankingService: RankingService
+
     @InjectMockKs
     lateinit var tournamentController: TournamentController
+
+    private val player1 = PlayerEntity(name = "Alex")
+    private val player2 = PlayerEntity(name = "Bert")
+
+    private val rankedPlayers = listOf(player1, player2)
 
     @Test
     fun insertPlayer() {
@@ -206,18 +215,22 @@ internal class TournamentControllerUnitTest {
     fun finishTournament() {
 
         val tournamentEntity = TournamentEntity(state = TournamentState.IN_PROGRESS)
+        tournamentEntity.addPlayer(player1)
+        tournamentEntity.addPlayer(player2)
         val savedTournamentSlot = slot<TournamentEntity>()
         every { tournamentRepository.findByIdOrNull(tournamentEntity.id) } returns tournamentEntity
         every { matchService.isResultMissing(tournamentEntity.matches) } returns false
         every { tournamentRepository.save(capture(savedTournamentSlot)) } answers {
             savedTournamentSlot.captured
         }
-
+        every { rankingService.rankPlayers(tournamentEntity) } returns rankedPlayers
 
         val finishedTournament = tournamentController.finishTournament(tournamentEntity.id)
 
         verify { tournamentRepository.save(savedTournamentSlot.captured) }
         assertThat(savedTournamentSlot.captured.state).isEqualTo(TournamentState.DONE)
+        assertThat(savedTournamentSlot.captured.getRankOfPlayer(player1)).isEqualTo(1)
+        assertThat(savedTournamentSlot.captured.getRankOfPlayer(player2)).isEqualTo(2)
         assertThat(finishedTournament.state).isEqualTo(TournamentState.DONE)
     }
 

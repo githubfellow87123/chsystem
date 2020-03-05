@@ -38,4 +38,23 @@ data class TournamentEntity(
         val tournamentPlayerEntity = TournamentPlayerEntity(this, player)
         tournamentPlayers.remove(tournamentPlayerEntity)
     }
+
+    fun setRankOfPlayer(player: PlayerEntity, rank: Int): Boolean {
+        val tournamentPlayer =
+            tournamentPlayers.find { tournamentPlayer -> tournamentPlayer.playerEntity == player }
+                ?: return false
+
+        tournamentPlayers.remove(tournamentPlayer)
+        tournamentPlayers.add(tournamentPlayer.copy(rank = rank))
+
+        return true
+    }
+
+    fun getRankOfPlayer(player: PlayerEntity): Int? {
+        val tournamentPlayer =
+            tournamentPlayers.find { tournamentPlayer -> tournamentPlayer.playerEntity == player }
+                ?: return null
+
+        return tournamentPlayer.rank
+    }
 }

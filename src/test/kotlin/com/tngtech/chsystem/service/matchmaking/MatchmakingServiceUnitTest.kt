@@ -6,7 +6,6 @@ import com.tngtech.chsystem.entities.MatchEntity
 import com.tngtech.chsystem.entities.PlayerEntity
 import com.tngtech.chsystem.entities.TournamentEntity
 import com.tngtech.chsystem.service.match.MatchService
-import com.tngtech.chsystem.service.rank.PlayerMatchesService
 import com.tngtech.chsystem.service.rank.RankingService
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
@@ -21,9 +20,6 @@ import kotlin.collections.HashMap
 
 @ExtendWith(MockKExtension::class)
 internal class MatchmakingServiceUnitTest {
-
-    @MockK
-    lateinit var playerMatchesService: PlayerMatchesService
 
     @MockK
     lateinit var rankingService: RankingService
@@ -56,7 +52,7 @@ internal class MatchmakingServiceUnitTest {
         val matchesForNextRoundSlot = slot<Set<MatchEntity>>()
 
         every { matchService.convertToPlayedMatches(tournament.matches) } returns setOf(playedMatch)
-        every { playerMatchesService.mapPlayersToMatches(tournament.getPlayers(), any()) } returns playerToMatches
+        every { matchService.mapPlayersToMatches(tournament.getPlayers(), any()) } returns playerToMatches
         every { rankingService.rankPlayers(playerToMatches) } returns rankedPlayers
         every { pairingService.generatePairingsForNextRound(rankedPlayers, playerToMatches) } returns listOf(0 to 1)
         every {
@@ -87,7 +83,7 @@ internal class MatchmakingServiceUnitTest {
         val matchesForNextRoundSlot = slot<Set<MatchEntity>>()
 
         every { matchService.convertToPlayedMatches(tournament.matches) } returns setOf(playedMatch)
-        every { playerMatchesService.mapPlayersToMatches(tournament.getPlayers(), any()) } returns playerToMatches
+        every { matchService.mapPlayersToMatches(tournament.getPlayers(), any()) } returns playerToMatches
         every { rankingService.rankPlayers(playerToMatches) } returns rankedPlayers
         every { pairingService.generatePairingsForNextRound(rankedPlayers, playerToMatches) } returns listOf(0 to 1)
         every {
@@ -130,7 +126,7 @@ internal class MatchmakingServiceUnitTest {
         val rankedPlayers = listOf(player1, player2)
 
         every { matchService.convertToPlayedMatches(tournament.matches) } returns setOf(playedMatch)
-        every { playerMatchesService.mapPlayersToMatches(tournament.getPlayers(), any()) } returns playerToMatches
+        every { matchService.mapPlayersToMatches(tournament.getPlayers(), any()) } returns playerToMatches
         every { rankingService.rankPlayers(playerToMatches) } returns rankedPlayers
         every { pairingService.generatePairingsForNextRound(rankedPlayers, playerToMatches) } returns null
 

@@ -2,8 +2,10 @@ package com.tngtech.chsystem.service.rank
 
 import com.tngtech.chsystem.dto.PlayedMatch
 import com.tngtech.chsystem.dto.Score
+import com.tngtech.chsystem.entities.MatchEntity
 import com.tngtech.chsystem.entities.PlayerEntity
 import com.tngtech.chsystem.entities.TournamentEntity
+import com.tngtech.chsystem.service.match.MatchService
 import com.tngtech.chsystem.service.score.ScoreService
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -20,6 +22,9 @@ internal class RankingServiceUnitTest {
     @MockK
     lateinit var scoreService: ScoreService
 
+    @MockK
+    lateinit var matchService: MatchService
+
     private val random = Random()
 
     private lateinit var rankingService: RankingService
@@ -33,7 +38,7 @@ internal class RankingServiceUnitTest {
 
     @BeforeEach
     fun setUp() {
-        rankingService = RankingService(scoreService, random)
+        rankingService = RankingService(scoreService, random, matchService)
     }
 
     @Test
@@ -82,8 +87,8 @@ internal class RankingServiceUnitTest {
 
         assertThat(scorePlayer24).isGreaterThan(scorePlayer13)
 
-        val rankingService1 = RankingService(scoreService, Random(1L))
-        val rankingService2 = RankingService(scoreService, Random(123743L))
+        val rankingService1 = RankingService(scoreService, Random(1L), matchService)
+        val rankingService2 = RankingService(scoreService, Random(123743L), matchService)
 
         val playersOrderedByRank1 = rankingService1.rankPlayers(playerToMatches)
         assertThat(playersOrderedByRank1[0]).isEqualTo(player2)
@@ -96,5 +101,48 @@ internal class RankingServiceUnitTest {
         assertThat(playersOrderedByRank2[1]).isEqualTo(player2)
         assertThat(playersOrderedByRank2[2]).isEqualTo(player1)
         assertThat(playersOrderedByRank2[3]).isEqualTo(player3)
+    }
+
+    @Test
+    fun `rankPlayers with tournament input`() {
+        val matchPlayer12 = MatchEntity(UUID.randomUUID(), tournament, 1, player1, player2, 0, 2)
+        val matchPlayer34 = MatchEntity(UUID.randomUUID(), tournament, 1, player3, player4, 1, 2)
+        val playedMatchPlayer12 = PlayedMatch(UUID.randomUUID(), tournament, 1, player1, player2, 0, 2)
+        val playedMatchPlayer34 = PlayedMatch(UUID.randomUUID(), tournament, 1, player3, player4, 1, 2)
+        val playedMatches = setOf(
+            playedMatchPlayer12,
+            playedMatchPlayer34
+        )
+
+        val playerToMatches = mapOf(
+            player1 to setOf(playedMatchPlayer12),
+            player2 to setOf(playedMatchPlayer12),
+            player3 to setOf(playedMatchPlayer34),
+            player4 to setOf(playedMatchPlayer34)
+        )
+        val playerToScores = mapOf(
+            player1 to Score(0, 3.0, 0.0, 1.0),
+            player2 to Score(3, 0.0, 1.0, 1.0),
+            player3 to Score(0, 3.0, 1.0 / 3, 2.0 / 3),
+            player4 to Score(3, 0.0, 2.0 / 3, 1.0 / 3)
+        )
+
+        val tournament = tournament.copy()
+        tournament.matches.add(matchPlayer12)
+        tournament.matches.add(matchPlayer34)
+
+        every { scoreService.calculatePlayerScores(playerToMatches) } returns playerToScores
+        every { matchService.convertToPlayedMatches(tournament.matches) } returns playedMatches
+        every { matchService.mapPlayersToMatches(tournament.getPlayers(), playedMatches) } returns playerToMatches
+
+        val playersOrderedByRank = rankingService.rankPlayers(tournament)!!
+
+        assertThat(playerToScores.getValue(player2)).isGreaterThan(playerToScores.getValue(player4))
+        assertThat(playerToScores.getValue(player4)).isGreaterThan(playerToScores.getValue(player3))
+        assertThat(playerToScores.getValue(player3)).isGreaterThan(playerToScores.getValue(player1))
+        assertThat(playersOrderedByRank[0]).isEqualTo(player2)
+        assertThat(playersOrderedByRank[1]).isEqualTo(player4)
+        assertThat(playersOrderedByRank[2]).isEqualTo(player3)
+        assertThat(playersOrderedByRank[3]).isEqualTo(player1)
     }
 }

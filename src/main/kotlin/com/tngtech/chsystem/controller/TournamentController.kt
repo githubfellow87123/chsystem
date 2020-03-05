@@ -7,6 +7,7 @@ import com.tngtech.chsystem.model.TournamentModel
 import com.tngtech.chsystem.service.match.MatchService
 import com.tngtech.chsystem.service.matchmaking.MatchmakingCode
 import com.tngtech.chsystem.service.matchmaking.MatchmakingService
+import com.tngtech.chsystem.service.rank.RankingService
 import mu.KotlinLogging
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -18,7 +19,8 @@ import java.util.*
 class TournamentController(
     private val tournamentRepository: TournamentRepository,
     private val matchmakingService: MatchmakingService,
-    private val matchService: MatchService
+    private val matchService: MatchService,
+    private val rankingService: RankingService
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -103,10 +105,7 @@ class TournamentController(
         return when (tournament.state) {
             TournamentState.INITIALIZING -> throw TournamentInWrongStateException("The tournament needs to be started before finishing it")
             TournamentState.IN_PROGRESS -> {
-                val finishedTournament = tournament.copy(
-                    state = TournamentState.DONE
-                )
-
+                val finishedTournament = generateFinishedTournament(tournament)
                 tournamentRepository.save(finishedTournament)
                 finishedTournament.toTournamentModel()
             }
@@ -114,7 +113,30 @@ class TournamentController(
         }
     }
 
-    // TODO add method to fetch a tournament
+    private fun generateFinishedTournament(tournament: TournamentEntity): TournamentEntity {
+        val finishedTournament = tournament.copy(
+            state = TournamentState.DONE
+        )
+
+        val rankedPlayers =
+            rankingService.rankPlayers(tournament) ?: throw UnableToFinishTournamentException("Unable to rank players")
+        for (i in rankedPlayers.indices) {
+            if (!finishedTournament.setRankOfPlayer(rankedPlayers[i], i + 1)) {
+                logger.warn("Player ${rankedPlayers[i].id} not found in tournament ${tournament.id}")
+            }
+        }
+        return finishedTournament
+    }
+
+    // TODO implement, should contain ranking and score information of players
+    @GetMapping("{tournamentId}/standings")
+    fun getStandings(@PathVariable tournamentId: UUID): TournamentModel {
+
+        val tournament = tournamentRepository.findByIdOrNull(tournamentId)
+            ?: throw TournamentDoesNotExistException(tournamentId)
+
+        return TournamentModel()
+    }
 
     private fun TournamentModel.toTournamentEntity() = TournamentEntity(date = date)
 

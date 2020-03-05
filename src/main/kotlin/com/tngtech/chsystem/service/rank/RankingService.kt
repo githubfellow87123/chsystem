@@ -3,6 +3,8 @@ package com.tngtech.chsystem.service.rank
 import com.tngtech.chsystem.dto.PlayedMatch
 import com.tngtech.chsystem.dto.Score
 import com.tngtech.chsystem.entities.PlayerEntity
+import com.tngtech.chsystem.entities.TournamentEntity
+import com.tngtech.chsystem.service.match.MatchService
 import com.tngtech.chsystem.service.score.ScoreService
 import org.springframework.stereotype.Service
 import java.util.*
@@ -10,8 +12,15 @@ import java.util.*
 @Service
 class RankingService(
     private val scoreService: ScoreService,
-    private val random: Random
+    private val random: Random,
+    private val matchService: MatchService
 ) {
+    fun rankPlayers(tournament: TournamentEntity): List<PlayerEntity>? {
+        val playedMatches = matchService.convertToPlayedMatches(tournament.matches)
+            ?: return null
+        val playerToMatches = matchService.mapPlayersToMatches(tournament.getPlayers(), playedMatches)
+        return rankPlayers(playerToMatches)
+    }
 
     fun rankPlayers(playerToMatches: Map<PlayerEntity, Set<PlayedMatch>>): List<PlayerEntity> {
 
