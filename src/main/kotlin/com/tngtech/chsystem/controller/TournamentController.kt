@@ -3,16 +3,19 @@ package com.tngtech.chsystem.controller
 import com.tngtech.chsystem.dao.TournamentRepository
 import com.tngtech.chsystem.entities.TournamentEntity
 import com.tngtech.chsystem.entities.TournamentState
+import com.tngtech.chsystem.model.StandingsModel
 import com.tngtech.chsystem.model.TournamentModel
 import com.tngtech.chsystem.service.match.MatchService
 import com.tngtech.chsystem.service.matchmaking.MatchmakingCode
 import com.tngtech.chsystem.service.matchmaking.MatchmakingService
 import com.tngtech.chsystem.service.rank.RankingService
+import com.tngtech.chsystem.service.score.ScoreService
 import mu.KotlinLogging
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 @RestController
 @RequestMapping("tournaments")
@@ -20,7 +23,8 @@ class TournamentController(
     private val tournamentRepository: TournamentRepository,
     private val matchmakingService: MatchmakingService,
     private val matchService: MatchService,
-    private val rankingService: RankingService
+    private val rankingService: RankingService,
+    private val scoreService: ScoreService
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -128,14 +132,32 @@ class TournamentController(
         return finishedTournament
     }
 
-    // TODO implement, should contain ranking and score information of players
     @GetMapping("{tournamentId}/standings")
-    fun getStandings(@PathVariable tournamentId: UUID): TournamentModel {
+    fun getStandings(@PathVariable tournamentId: UUID): List<StandingsModel> {
 
         val tournament = tournamentRepository.findByIdOrNull(tournamentId)
             ?: throw TournamentDoesNotExistException(tournamentId)
+        val playerToScores = scoreService.calculateScores(tournament)
 
-        return TournamentModel()
+        val standings = ArrayList<StandingsModel>()
+
+        for ((player, score) in playerToScores) {
+            val standing = StandingsModel(
+                playerName = player.name,
+                score = score.rankingScore.primaryScore,
+                matchWins = score.statisticScore.matchWins,
+                matchLosses = score.statisticScore.matchLosses,
+                matchDraws = score.statisticScore.matchDraws,
+                opponentAverageScore = score.rankingScore.opponentAverageScore,
+                gameWins = score.statisticScore.gameWins,
+                gameLosses = score.statisticScore.gameLosses,
+                gameWinPercentage = score.rankingScore.gameWinPercentage,
+                opponentAverageGameWinPercentage = score.rankingScore.opponentAverageGameWinPercentage
+            )
+            standings.add(standing)
+        }
+
+        return standings
     }
 
     private fun TournamentModel.toTournamentEntity() = TournamentEntity(date = date)
