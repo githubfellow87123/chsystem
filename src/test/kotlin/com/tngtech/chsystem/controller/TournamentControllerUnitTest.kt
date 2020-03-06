@@ -351,4 +351,15 @@ internal class TournamentControllerUnitTest {
             )
         )
     }
+
+    @Test
+    fun `getStandings throws exception when tournament doesn't exist`() {
+
+        val tournament = TournamentEntity()
+        every { tournamentRepository.findByIdOrNull(tournament.id) } returns null
+
+        assertFailsWith<TournamentController.TournamentDoesNotExistException> {
+            tournamentController.getStandings(tournament.id)
+        }
+    }
 }

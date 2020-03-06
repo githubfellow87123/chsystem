@@ -3,6 +3,7 @@ package com.tngtech.chsystem.service.score
 import com.tngtech.chsystem.dto.PlayedMatch
 import com.tngtech.chsystem.entities.PlayerEntity
 import com.tngtech.chsystem.entities.TournamentEntity
+import com.tngtech.chsystem.service.match.MatchService
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -26,6 +27,9 @@ internal class RankingScoreServiceUnitTest {
 
     @MockK
     lateinit var opponentAverageGameWinPercentageService: OpponentAverageGameWinPercentageService
+
+    @MockK
+    lateinit var matchService: MatchService
 
     @InjectMockKs
     lateinit var rankingScoreService: RankingScoreService

@@ -68,4 +68,18 @@ internal class StatisticScoreServiceTest {
         assertThat(playerToStatisticScores.getValue(player4).gameWins).isEqualTo(2)
         assertThat(playerToStatisticScores.getValue(player4).gameLosses).isEqualTo(4)
     }
+
+    @Test
+    fun `calculateScores no matches played`() {
+
+        val playerToStatisticScores = statisticScoreService.calculateScores(tournament)
+
+        for (player in setOf(player1, player2, player3, player4)) {
+            assertThat(playerToStatisticScores.getValue(player).matchWins).isEqualTo(0)
+            assertThat(playerToStatisticScores.getValue(player).matchLosses).isEqualTo(0)
+            assertThat(playerToStatisticScores.getValue(player).matchDraws).isEqualTo(0)
+            assertThat(playerToStatisticScores.getValue(player).gameWins).isEqualTo(0)
+            assertThat(playerToStatisticScores.getValue(player).gameLosses).isEqualTo(0)
+        }
+    }
 }
