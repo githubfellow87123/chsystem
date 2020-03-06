@@ -13,6 +13,19 @@ class MatchService {
         return convertToPlayedMatches(matchEntities) == null
     }
 
+    fun getAllPlayedMatches(matchEntities: Set<MatchEntity>): Set<PlayedMatch> {
+
+        val playedMatches = HashSet<PlayedMatch>()
+        for (match in matchEntities) {
+            val playedMatch = match.toPlayedMatch()
+            if (playedMatch != null) {
+                playedMatches.add(playedMatch)
+            }
+        }
+
+        return playedMatches
+    }
+
     fun convertToPlayedMatches(matchEntities: Set<MatchEntity>): Set<PlayedMatch>? {
 
         val playedMatches = HashSet<PlayedMatch>()
