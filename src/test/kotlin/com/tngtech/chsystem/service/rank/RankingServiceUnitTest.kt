@@ -1,12 +1,12 @@
 package com.tngtech.chsystem.service.rank
 
 import com.tngtech.chsystem.dto.PlayedMatch
-import com.tngtech.chsystem.dto.Score
+import com.tngtech.chsystem.dto.RankingScore
 import com.tngtech.chsystem.entities.MatchEntity
 import com.tngtech.chsystem.entities.PlayerEntity
 import com.tngtech.chsystem.entities.TournamentEntity
 import com.tngtech.chsystem.service.match.MatchService
-import com.tngtech.chsystem.service.score.ScoreService
+import com.tngtech.chsystem.service.score.RankingScoreService
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -20,7 +20,7 @@ import java.util.*
 internal class RankingServiceUnitTest {
 
     @MockK
-    lateinit var scoreService: ScoreService
+    lateinit var rankingScoreService: RankingScoreService
 
     @MockK
     lateinit var matchService: MatchService
@@ -38,7 +38,7 @@ internal class RankingServiceUnitTest {
 
     @BeforeEach
     fun setUp() {
-        rankingService = RankingService(scoreService, random, matchService)
+        rankingService = RankingService(rankingScoreService, random, matchService)
     }
 
     @Test
@@ -54,12 +54,12 @@ internal class RankingServiceUnitTest {
             player4 to setOf(matchPlayer34)
         )
         val playerToScores = mapOf(
-            player1 to Score(0, 3.0, 0.0, 1.0),
-            player2 to Score(3, 0.0, 1.0, 1.0),
-            player3 to Score(0, 3.0, 1.0 / 3, 2.0 / 3),
-            player4 to Score(3, 0.0, 2.0 / 3, 1.0 / 3)
+            player1 to RankingScore(0, 3.0, 0.0, 1.0),
+            player2 to RankingScore(3, 0.0, 1.0, 1.0),
+            player3 to RankingScore(0, 3.0, 1.0 / 3, 2.0 / 3),
+            player4 to RankingScore(3, 0.0, 2.0 / 3, 1.0 / 3)
         )
-        every { scoreService.calculatePlayerScores(playerToMatches) } returns playerToScores
+        every { rankingScoreService.calculatePlayerScores(playerToMatches) } returns playerToScores
 
         val playersOrderedByRank = rankingService.rankPlayers(playerToMatches)
 
@@ -75,20 +75,20 @@ internal class RankingServiceUnitTest {
     @Test
     fun `rankPlayers players with same score are shuffled sanity check`() {
         val playerToMatches: Map<PlayerEntity, Set<PlayedMatch>> = mapOf(player1 to emptySet(), player2 to emptySet())
-        val scorePlayer13 = Score(0, 0.0, 0.0, 0.0)
-        val scorePlayer24 = Score(3, 0.0, 0.0, 0.0)
+        val scorePlayer13 = RankingScore(0, 0.0, 0.0, 0.0)
+        val scorePlayer24 = RankingScore(3, 0.0, 0.0, 0.0)
         val playerToScores = mapOf(
             player1 to scorePlayer13,
             player2 to scorePlayer24,
             player3 to scorePlayer13,
             player4 to scorePlayer24
         )
-        every { scoreService.calculatePlayerScores(playerToMatches) } returns playerToScores
+        every { rankingScoreService.calculatePlayerScores(playerToMatches) } returns playerToScores
 
         assertThat(scorePlayer24).isGreaterThan(scorePlayer13)
 
-        val rankingService1 = RankingService(scoreService, Random(1L), matchService)
-        val rankingService2 = RankingService(scoreService, Random(123743L), matchService)
+        val rankingService1 = RankingService(rankingScoreService, Random(1L), matchService)
+        val rankingService2 = RankingService(rankingScoreService, Random(123743L), matchService)
 
         val playersOrderedByRank1 = rankingService1.rankPlayers(playerToMatches)
         assertThat(playersOrderedByRank1[0]).isEqualTo(player2)
@@ -121,17 +121,17 @@ internal class RankingServiceUnitTest {
             player4 to setOf(playedMatchPlayer34)
         )
         val playerToScores = mapOf(
-            player1 to Score(0, 3.0, 0.0, 1.0),
-            player2 to Score(3, 0.0, 1.0, 1.0),
-            player3 to Score(0, 3.0, 1.0 / 3, 2.0 / 3),
-            player4 to Score(3, 0.0, 2.0 / 3, 1.0 / 3)
+            player1 to RankingScore(0, 3.0, 0.0, 1.0),
+            player2 to RankingScore(3, 0.0, 1.0, 1.0),
+            player3 to RankingScore(0, 3.0, 1.0 / 3, 2.0 / 3),
+            player4 to RankingScore(3, 0.0, 2.0 / 3, 1.0 / 3)
         )
 
         val tournament = tournament.copy()
         tournament.matches.add(matchPlayer12)
         tournament.matches.add(matchPlayer34)
 
-        every { scoreService.calculatePlayerScores(playerToMatches) } returns playerToScores
+        every { rankingScoreService.calculatePlayerScores(playerToMatches) } returns playerToScores
         every { matchService.convertToPlayedMatches(tournament.matches) } returns playedMatches
         every { matchService.mapPlayersToMatches(tournament.getPlayers(), playedMatches) } returns playerToMatches
 

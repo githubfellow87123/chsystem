@@ -13,7 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import java.util.*
 
 @ExtendWith(MockKExtension::class)
-internal class ScoreServiceUnitTest {
+internal class RankingScoreServiceUnitTest {
 
     @MockK
     lateinit var primaryScoreService: PrimaryScoreService
@@ -28,7 +28,7 @@ internal class ScoreServiceUnitTest {
     lateinit var opponentAverageGameWinPercentageService: OpponentAverageGameWinPercentageService
 
     @InjectMockKs
-    lateinit var scoreService: ScoreService
+    lateinit var rankingScoreService: RankingScoreService
 
     private val player1 = PlayerEntity(name = "Alex")
     private val player2 = PlayerEntity(name = "Bart")
@@ -60,7 +60,7 @@ internal class ScoreServiceUnitTest {
             )
         } returns playerToOpponentAverageGameWinPercentage
 
-        val playerToScore = scoreService.calculatePlayerScores(playersToMatches)
+        val playerToScore = rankingScoreService.calculatePlayerScores(playersToMatches)
 
         assertThat(playerToScore.getValue(player1).primaryScore)
         assertThat(playerToScore.getValue(player1).opponentAverageScore)

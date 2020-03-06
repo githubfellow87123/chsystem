@@ -1,17 +1,17 @@
 package com.tngtech.chsystem.service.rank
 
 import com.tngtech.chsystem.dto.PlayedMatch
-import com.tngtech.chsystem.dto.Score
+import com.tngtech.chsystem.dto.RankingScore
 import com.tngtech.chsystem.entities.PlayerEntity
 import com.tngtech.chsystem.entities.TournamentEntity
 import com.tngtech.chsystem.service.match.MatchService
-import com.tngtech.chsystem.service.score.ScoreService
+import com.tngtech.chsystem.service.score.RankingScoreService
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
 class RankingService(
-    private val scoreService: ScoreService,
+    private val rankingScoreService: RankingScoreService,
     private val random: Random,
     private val matchService: MatchService
 ) {
@@ -24,21 +24,21 @@ class RankingService(
 
     fun rankPlayers(playerToMatches: Map<PlayerEntity, Set<PlayedMatch>>): List<PlayerEntity> {
 
-        val playerToScore = scoreService.calculatePlayerScores(playerToMatches)
+        val playerToScore = rankingScoreService.calculatePlayerScores(playerToMatches)
 
         return sortPlayers(playerToScore)
     }
 
-    private fun sortPlayers(playerToScore: Map<PlayerEntity, Score>): List<PlayerEntity> {
-        val sortedPlayers = playerToScore.keys.toList()
-            .sortedByDescending { playerToScore.getValue(it) }
+    private fun sortPlayers(playerToRankingScore: Map<PlayerEntity, RankingScore>): List<PlayerEntity> {
+        val sortedPlayers = playerToRankingScore.keys.toList()
+            .sortedByDescending { playerToRankingScore.getValue(it) }
 
-        return shufflePlayersWithEqualScore(sortedPlayers, playerToScore)
+        return shufflePlayersWithEqualScore(sortedPlayers, playerToRankingScore)
     }
 
     private fun shufflePlayersWithEqualScore(
         sortedPlayers: List<PlayerEntity>,
-        playerToScore: Map<PlayerEntity, Score>
+        playerToRankingScore: Map<PlayerEntity, RankingScore>
     ): List<PlayerEntity> {
         val sortedPlayersEqualScoreShuffled = sortedPlayers.toMutableList()
 
@@ -46,13 +46,13 @@ class RankingService(
         while (i < sortedPlayersEqualScoreShuffled.size) {
 
             val playerI = sortedPlayersEqualScoreShuffled[i]
-            val scorePlayerI = playerToScore.getValue(playerI)
+            val scorePlayerI = playerToRankingScore.getValue(playerI)
             var j = i + 1
 
             while (j < sortedPlayersEqualScoreShuffled.size) {
 
                 val playerJ = sortedPlayersEqualScoreShuffled[j]
-                val scorePlayerJ = playerToScore.getValue(playerJ)
+                val scorePlayerJ = playerToRankingScore.getValue(playerJ)
 
                 if (scorePlayerI != scorePlayerJ) {
                     break
