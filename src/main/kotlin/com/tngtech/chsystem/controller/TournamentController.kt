@@ -157,6 +157,8 @@ class TournamentController(
             standings.add(standing)
         }
 
+        standings.sortByDescending { it }
+
         return standings
     }
 
