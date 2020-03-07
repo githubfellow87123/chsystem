@@ -24,7 +24,8 @@ class TournamentController(
     private val matchmakingService: MatchmakingService,
     private val matchService: MatchService,
     private val rankingService: RankingService,
-    private val scoreService: ScoreService
+    private val scoreService: ScoreService,
+    private val random: Random
 ) {
     private val logger = KotlinLogging.logger {}
 
@@ -58,6 +59,10 @@ class TournamentController(
                 val startedTournament = tournament.copy(
                     state = TournamentState.IN_PROGRESS
                 )
+
+                for ((i, player) in tournament.getPlayers().shuffled(random).withIndex()) {
+                    startedTournament.setSeatingOrderOfPlayer(player, i + 1)
+                }
 
                 tournamentRepository.save(startedTournament)
                 startedTournament.toTournamentModel()

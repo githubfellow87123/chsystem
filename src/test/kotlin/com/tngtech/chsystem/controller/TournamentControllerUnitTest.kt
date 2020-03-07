@@ -17,6 +17,7 @@ import com.tngtech.chsystem.service.score.ScoreService
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
+import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.slot
 import io.mockk.verify
@@ -26,6 +27,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.*
 import kotlin.test.assertFailsWith
 
 @ExtendWith(MockKExtension::class)
@@ -45,6 +47,9 @@ internal class TournamentControllerUnitTest {
 
     @MockK
     lateinit var scoreService: ScoreService
+
+    @RelaxedMockK
+    lateinit var random: Random
 
     @InjectMockKs
     lateinit var tournamentController: TournamentController
@@ -113,6 +118,8 @@ internal class TournamentControllerUnitTest {
         assertThat(startedTournament.roundIndex).isEqualTo(0)
         assertThat(tournamentEntitySlot.captured.state).isEqualTo(TournamentState.IN_PROGRESS)
         assertThat(tournamentEntitySlot.captured.roundIndex).isEqualTo(0)
+        assertThat(tournamentEntitySlot.captured.getSeatingOrderOfPlayer(player1)).isNotNull()
+        assertThat(tournamentEntitySlot.captured.getSeatingOrderOfPlayer(player2)).isNotNull()
     }
 
     @Test

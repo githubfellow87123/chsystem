@@ -65,4 +65,23 @@ data class TournamentEntity(
 
         return tournamentPlayer.rank
     }
+
+    fun setSeatingOrderOfPlayer(player: PlayerEntity, seatingOrder: Int): Boolean {
+        val tournamentPlayer =
+            tournamentPlayers.find { tournamentPlayer -> tournamentPlayer.playerEntity == player }
+                ?: return false
+
+        tournamentPlayers.remove(tournamentPlayer)
+        tournamentPlayers.add(tournamentPlayer.copy(seatingOrder = seatingOrder))
+
+        return true
+    }
+
+    fun getSeatingOrderOfPlayer(player: PlayerEntity): Int? {
+        val tournamentPlayer =
+            tournamentPlayers.find { tournamentPlayer -> tournamentPlayer.playerEntity == player }
+                ?: return null
+
+        return tournamentPlayer.seatingOrder
+    }
 }

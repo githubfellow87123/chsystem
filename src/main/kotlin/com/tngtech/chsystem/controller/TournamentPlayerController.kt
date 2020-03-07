@@ -15,8 +15,7 @@ import java.util.*
 @RequestMapping("tournaments/{tournamentId}/players")
 class TournamentPlayerController(
     private val tournamentRepository: TournamentRepository,
-    private val playerRepository: PlayerRepository,
-    private val random: Random
+    private val playerRepository: PlayerRepository
 ) {
 
     @PutMapping("{playerId}")
@@ -59,13 +58,17 @@ class TournamentPlayerController(
         }
     }
 
-    @GetMapping("random")
+    @GetMapping("seatingOrder")
     fun getRandomListOfPlayers(@PathVariable tournamentId: UUID): List<PlayerModel> {
         val tournament = findTournament(tournamentId)
 
+        if (tournament.state == TournamentState.INITIALIZING) {
+            SeatingOrderNotPresentException("Tournament is in initializing state, seating order will be present when tournament has started")
+        }
+
         return tournament.getPlayers()
+            .sortedBy { tournament.getSeatingOrderOfPlayer(it) }
             .map { p -> p.toPlayerModel() }
-            .shuffled(random)
     }
 
     private fun checkTournamentState(tournament: TournamentEntity) {
@@ -107,6 +110,9 @@ class TournamentPlayerController(
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     class PlayerNotAssignedToTournamentException(message: String) : RuntimeException(message)
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    class SeatingOrderNotPresentException(message: String) : RuntimeException(message)
 
     @ResponseStatus(HttpStatus.CONFLICT)
     class TournamentAlreadyStartedException(message: String) : RuntimeException(message)

@@ -16,7 +16,9 @@ data class TournamentPlayerEntity(
     @JoinColumn(name = "PLAYER_ID", columnDefinition = "UUID")
     val playerEntity: PlayerEntity,
     @Column(nullable = true)
-    val rank: Int?
+    val rank: Int?,
+    @Column(nullable = true)
+    val seatingOrder: Int?
 ) {
     constructor(tournamentEntity: TournamentEntity, playerEntity: PlayerEntity) : this(
         TournamentPlayerId(
@@ -25,13 +27,15 @@ data class TournamentPlayerEntity(
         ),
         tournamentEntity,
         playerEntity,
+        null,
         null
     )
 
     override fun toString(): String = "TournamentPlayerEntity[" +
             "tournamentId = ${tournamentPlayerId.tournamentId}, " +
             "playerId = ${tournamentPlayerId.playerId}, " +
-            "rank: $rank" +
+            "rank: $rank, " +
+            "seatingOrder: $seatingOrder" +
             "]"
 
     override fun hashCode(): Int {
@@ -42,5 +46,6 @@ data class TournamentPlayerEntity(
         return (other is TournamentPlayerEntity)
                 && tournamentPlayerId == other.tournamentPlayerId
                 && rank == other.rank
+                && seatingOrder == other.seatingOrder
     }
 }
