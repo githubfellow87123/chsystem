@@ -15,6 +15,7 @@ import io.mockk.slot
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.time.LocalDateTime
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -40,7 +41,7 @@ internal class MatchmakingServiceUnitTest {
     private val player1 = PlayerEntity(name = "Alex")
     private val player2 = PlayerEntity(name = "Bert")
     private val match = MatchEntity(UUID.randomUUID(), tournament, 1, player1, player2, 2, 0)
-    private val playedMatch = PlayedMatch(UUID.randomUUID(), tournament, 1, player1, player2, 2, 0)
+    private val playedMatch = PlayedMatch(UUID.randomUUID(), tournament, 1, player1, player2, 2, 0, LocalDateTime.now())
 
     @Test
     fun generateMatchesForNextRound() {

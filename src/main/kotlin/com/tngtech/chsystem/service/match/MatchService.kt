@@ -71,7 +71,8 @@ class MatchService {
             player1,
             player2,
             winsPlayer1Val,
-            winsPlayer2Val
+            winsPlayer2Val,
+            lastUpdated
         )
     }
 

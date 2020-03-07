@@ -5,6 +5,7 @@ import com.tngtech.chsystem.entities.PlayerEntity
 import com.tngtech.chsystem.entities.TournamentEntity
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 import java.util.*
 
 internal class OpponentAverageGameWinPercentageServiceUnitTest {
@@ -115,7 +116,7 @@ internal class OpponentAverageGameWinPercentageServiceUnitTest {
     ): PlayedMatch {
         return PlayedMatch(
             UUID.randomUUID(), tournament, 1, player1, player2,
-            0, 0
+            0, 0, LocalDateTime.now()
         )
     }
 }

@@ -1,6 +1,7 @@
 package com.tngtech.chsystem.model
 
 import com.tngtech.chsystem.dto.RankingScore
+import java.time.LocalDateTime
 
 data class StandingsModel(
     val playerName: String,
@@ -12,7 +13,8 @@ data class StandingsModel(
     val gameWins: Int,
     val gameLosses: Int,
     val gameWinPercentage: Double,
-    val opponentAverageGameWinPercentage: Double
+    val opponentAverageGameWinPercentage: Double,
+    val latestMatchUpdate: LocalDateTime?
 ) : Comparable<StandingsModel> {
 
     override fun compareTo(other: StandingsModel): Int {
@@ -26,13 +28,17 @@ data class StandingsModel(
                 other.opponentAverageGameWinPercentage
             )
 
-        return rankingsScore.compareTo(rankingsScoreOther)
-
-        // TODO sort by last played match when the scores are the same
-        // return when {
-        //     rankingsScore != rankingsScoreOther -> rankingsScore.compareTo(rankingsScoreOther)
-        //     else -> score.compareTo(other.score)
-        // }
+        return when {
+            rankingsScore != rankingsScoreOther -> rankingsScore.compareTo(rankingsScoreOther)
+            latestMatchUpdate != other.latestMatchUpdate -> {
+                when {
+                    latestMatchUpdate == null -> 1
+                    other.latestMatchUpdate == null -> -1
+                    else -> other.latestMatchUpdate.compareTo(latestMatchUpdate)
+                }
+            }
+            else -> other.playerName.compareTo(playerName)
+        }
     }
 
 

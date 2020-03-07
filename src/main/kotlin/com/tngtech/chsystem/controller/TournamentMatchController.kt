@@ -6,6 +6,7 @@ import com.tngtech.chsystem.model.MatchResultModel
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDateTime
 import java.util.*
 
 @RestController
@@ -48,7 +49,8 @@ class TournamentMatchController(
 
         val matchWithEnteredResult = match.copy(
             winsPlayer1 = matchResultModel.winsPlayer1,
-            winsPlayer2 = matchResultModel.winsPlayer2
+            winsPlayer2 = matchResultModel.winsPlayer2,
+            lastUpdated = LocalDateTime.now()
         )
 
         matchRepository.save(matchWithEnteredResult)

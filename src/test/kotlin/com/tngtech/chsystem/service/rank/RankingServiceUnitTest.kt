@@ -14,6 +14,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.time.LocalDateTime
 import java.util.*
 
 @ExtendWith(MockKExtension::class)
@@ -43,8 +44,8 @@ internal class RankingServiceUnitTest {
 
     @Test
     fun rankPlayers() {
-        val matchPlayer12 = PlayedMatch(UUID.randomUUID(), tournament, 1, player1, player2, 0, 2)
-        val matchPlayer34 = PlayedMatch(UUID.randomUUID(), tournament, 1, player3, player4, 1, 2)
+        val matchPlayer12 = PlayedMatch(UUID.randomUUID(), tournament, 1, player1, player2, 0, 2, LocalDateTime.now())
+        val matchPlayer34 = PlayedMatch(UUID.randomUUID(), tournament, 1, player3, player4, 1, 2, LocalDateTime.now())
 
 
         val playerToMatches = mapOf(
@@ -107,8 +108,10 @@ internal class RankingServiceUnitTest {
     fun `rankPlayers with tournament input`() {
         val matchPlayer12 = MatchEntity(UUID.randomUUID(), tournament, 1, player1, player2, 0, 2)
         val matchPlayer34 = MatchEntity(UUID.randomUUID(), tournament, 1, player3, player4, 1, 2)
-        val playedMatchPlayer12 = PlayedMatch(UUID.randomUUID(), tournament, 1, player1, player2, 0, 2)
-        val playedMatchPlayer34 = PlayedMatch(UUID.randomUUID(), tournament, 1, player3, player4, 1, 2)
+        val playedMatchPlayer12 =
+            PlayedMatch(UUID.randomUUID(), tournament, 1, player1, player2, 0, 2, LocalDateTime.now())
+        val playedMatchPlayer34 =
+            PlayedMatch(UUID.randomUUID(), tournament, 1, player3, player4, 1, 2, LocalDateTime.now())
         val playedMatches = setOf(
             playedMatchPlayer12,
             playedMatchPlayer34

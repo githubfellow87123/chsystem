@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import java.time.LocalDateTime
 import java.util.*
 import java.util.stream.Collectors
 import kotlin.test.assertFailsWith
@@ -68,7 +69,7 @@ internal class GameWinPercentageServiceUnitTest {
         val matches = setOf(
             PlayedMatch(
                 UUID.randomUUID(), tournament, 1, player2, null,
-                2, 0
+                2, 0, LocalDateTime.now()
             )
         )
 
@@ -82,7 +83,7 @@ internal class GameWinPercentageServiceUnitTest {
     private fun createMatch(winsPlayer1: Int, winsPlayer2: Int): PlayedMatch {
         return PlayedMatch(
             UUID.randomUUID(), tournament, 1, player1, player2,
-            winsPlayer1, winsPlayer2
+            winsPlayer1, winsPlayer2, LocalDateTime.now()
         )
     }
 }

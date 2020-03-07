@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
+import java.time.LocalDateTime
 import kotlin.test.assertFailsWith
 
 @ExtendWith(MockKExtension::class)
@@ -309,11 +310,11 @@ internal class TournamentControllerUnitTest {
         val tournament = TournamentEntity(state = TournamentState.DONE)
         val score1 = Score(
             RankingScore(3, 0.0, 0.66, 0.33),
-            StatisticScore(1, 0, 0, 2, 1)
+            StatisticScore(1, 0, 0, 2, 1, LocalDateTime.MIN)
         )
         val score2 = Score(
             RankingScore(0, 3.0, 0.33, 0.66),
-            StatisticScore(0, 1, 0, 1, 2)
+            StatisticScore(0, 1, 0, 1, 2, LocalDateTime.MIN)
         )
 
         every { tournamentRepository.findByIdOrNull(tournament.id) } returns tournament
@@ -333,7 +334,8 @@ internal class TournamentControllerUnitTest {
                 gameWins = 2,
                 gameLosses = 1,
                 gameWinPercentage = 0.66,
-                opponentAverageGameWinPercentage = 0.33
+                opponentAverageGameWinPercentage = 0.33,
+                latestMatchUpdate = LocalDateTime.MIN
             )
         )
         assertThat(standings).contains(
@@ -347,7 +349,8 @@ internal class TournamentControllerUnitTest {
                 gameWins = 1,
                 gameLosses = 2,
                 gameWinPercentage = 0.33,
-                opponentAverageGameWinPercentage = 0.66
+                opponentAverageGameWinPercentage = 0.66,
+                latestMatchUpdate = LocalDateTime.MIN
             )
         )
     }

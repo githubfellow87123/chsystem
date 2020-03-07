@@ -1,5 +1,6 @@
 package com.tngtech.chsystem.entities
 
+import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
 
@@ -23,5 +24,7 @@ data class MatchEntity(
     @Column(nullable = true)
     val winsPlayer1: Int? = null,
     @Column(nullable = true)
-    val winsPlayer2: Int? = null
+    val winsPlayer2: Int? = null,
+    @Column(nullable = false)
+    val lastUpdated: LocalDateTime = LocalDateTime.now()
 )

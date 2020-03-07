@@ -152,7 +152,8 @@ class TournamentController(
                 gameWins = score.statisticScore.gameWins,
                 gameLosses = score.statisticScore.gameLosses,
                 gameWinPercentage = score.rankingScore.gameWinPercentage,
-                opponentAverageGameWinPercentage = score.rankingScore.opponentAverageGameWinPercentage
+                opponentAverageGameWinPercentage = score.rankingScore.opponentAverageGameWinPercentage,
+                latestMatchUpdate = score.statisticScore.latestMatchUpdate
             )
             standings.add(standing)
         }

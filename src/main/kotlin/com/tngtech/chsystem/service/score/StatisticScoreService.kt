@@ -6,6 +6,7 @@ import com.tngtech.chsystem.entities.PlayerEntity
 import com.tngtech.chsystem.entities.TournamentEntity
 import com.tngtech.chsystem.service.match.MatchService
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class StatisticScoreService(
@@ -28,8 +29,16 @@ class StatisticScoreService(
             val matchDraws = calculateMatchDraws(player, matches)
             val gameWins = calculateGameWins(player, matches)
             val gameLosses = calculateGameLosses(player, matches)
+            val latestMatchUpdate = calculateLatestMatchUpdate(player, matches)
 
-            playerToStatisticScore[player] = StatisticScore(matchWins, matchLosses, matchDraws, gameWins, gameLosses)
+            playerToStatisticScore[player] = StatisticScore(
+                matchWins = matchWins,
+                matchLosses = matchLosses,
+                matchDraws = matchDraws,
+                gameWins = gameWins,
+                gameLosses = gameLosses,
+                latestMatchUpdate = latestMatchUpdate
+            )
         }
 
         return playerToStatisticScore
@@ -97,5 +106,19 @@ class StatisticScoreService(
             }
         }
         return gameLosses
+    }
+
+    private fun calculateLatestMatchUpdate(player: PlayerEntity, matches: Set<PlayedMatch>): LocalDateTime? {
+        var latestMatchUpdate: LocalDateTime? = null
+
+        for (match in matches) {
+            when {
+                match.player1 == player || match.player2 == player -> if (latestMatchUpdate == null || latestMatchUpdate < match.lastUpdated) {
+                    latestMatchUpdate = match.lastUpdated
+                }
+                else -> throw RuntimeException("Match $match does not belong to player $player")
+            }
+        }
+        return latestMatchUpdate
     }
 }

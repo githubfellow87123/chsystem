@@ -11,6 +11,7 @@ import io.mockk.junit5.MockKExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.time.LocalDateTime
 import kotlin.test.assertFailsWith
 
 
@@ -35,8 +36,8 @@ internal class ScoreServiceTest {
 
         val rankingScore1 = RankingScore(3, 0.0, 0.66, 0.33)
         val rankingScore2 = RankingScore(0, 3.0, 0.33, 0.66)
-        val statisticScore1 = StatisticScore(1, 0, 0, 2, 1)
-        val statisticScore2 = StatisticScore(0, 1, 0, 1, 2)
+        val statisticScore1 = StatisticScore(1, 0, 0, 2, 1, LocalDateTime.now())
+        val statisticScore2 = StatisticScore(0, 1, 0, 1, 2, LocalDateTime.now())
 
         every { rankingScoreService.calculatePlayerScores(tournament) } returns mapOf(
             player1 to rankingScore1,
@@ -60,7 +61,7 @@ internal class ScoreServiceTest {
 
         val rankingScore1 = RankingScore(3, 0.0, 0.66, 0.33)
         val rankingScore2 = RankingScore(0, 3.0, 0.33, 0.66)
-        val statisticScore1 = StatisticScore(1, 0, 0, 2, 1)
+        val statisticScore1 = StatisticScore(1, 0, 0, 2, 1, LocalDateTime.now())
 
         every { rankingScoreService.calculatePlayerScores(tournament) } returns mapOf(
             player1 to rankingScore1,

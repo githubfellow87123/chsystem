@@ -11,6 +11,7 @@ import io.mockk.junit5.MockKExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.time.LocalDateTime
 import java.util.*
 
 @ExtendWith(MockKExtension::class)
@@ -41,7 +42,7 @@ internal class RankingScoreServiceUnitTest {
     @Test
     fun calculatePlayerScores() {
 
-        val matches = setOf(PlayedMatch(UUID.randomUUID(), tournament, 1, player1, player2, 2, 0))
+        val matches = setOf(PlayedMatch(UUID.randomUUID(), tournament, 1, player1, player2, 2, 0, LocalDateTime.now()))
         val playersToMatches = mapOf(player1 to matches, player2 to matches)
 
         val playerToPrimaryScore = mapOf(player1 to 3, player2 to 0)
