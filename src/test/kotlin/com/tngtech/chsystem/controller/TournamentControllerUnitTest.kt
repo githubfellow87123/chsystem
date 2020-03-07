@@ -307,7 +307,7 @@ internal class TournamentControllerUnitTest {
     @Test
     fun getStandings() {
 
-        val tournament = TournamentEntity(state = TournamentState.DONE)
+        val tournament = TournamentEntity(state = TournamentState.IN_PROGRESS)
         val score1 = Score(
             RankingScore(3, 0.0, 0.66, 0.33),
             StatisticScore(1, 0, 0, 2, 1, LocalDateTime.MIN)
@@ -323,7 +323,7 @@ internal class TournamentControllerUnitTest {
         val standings = tournamentController.getStandings(tournament.id)
 
         assertThat(standings).hasSize(2)
-        assertThat(standings).contains(
+        assertThat(standings).containsExactly(
             StandingsModel(
                 playerName = "Alex",
                 score = 3,
@@ -336,9 +336,7 @@ internal class TournamentControllerUnitTest {
                 gameWinPercentage = 0.66,
                 opponentAverageGameWinPercentage = 0.33,
                 latestMatchUpdate = LocalDateTime.MIN
-            )
-        )
-        assertThat(standings).contains(
+            ),
             StandingsModel(
                 playerName = "Bert",
                 score = 0,
@@ -350,6 +348,59 @@ internal class TournamentControllerUnitTest {
                 gameLosses = 2,
                 gameWinPercentage = 0.33,
                 opponentAverageGameWinPercentage = 0.66,
+                latestMatchUpdate = LocalDateTime.MIN
+            )
+        )
+    }
+
+    @Test
+    fun `getStandings standings are sorted by rank when tournament is done`() {
+
+        val tournament = TournamentEntity(state = TournamentState.DONE)
+        val score1 = Score(
+            RankingScore(3, 0.0, 0.66, 0.33),
+            StatisticScore(1, 0, 0, 2, 1, LocalDateTime.MIN)
+        )
+        val score2 = Score(
+            RankingScore(0, 3.0, 0.33, 0.66),
+            StatisticScore(0, 1, 0, 1, 2, LocalDateTime.MIN)
+        )
+        tournament.addPlayer(player1)
+        tournament.addPlayer(player2)
+        tournament.setRankOfPlayer(player1, 2)
+        tournament.setRankOfPlayer(player1, 1)
+
+        every { tournamentRepository.findByIdOrNull(tournament.id) } returns tournament
+        every { scoreService.calculateScores(tournament) } returns mapOf(player1 to score1, player2 to score2)
+
+        val standings = tournamentController.getStandings(tournament.id)
+
+        assertThat(standings).hasSize(2)
+        assertThat(standings).containsExactly(
+            StandingsModel(
+                playerName = "Bert",
+                score = 0,
+                matchWins = 0,
+                matchLosses = 1,
+                matchDraws = 0,
+                opponentAverageScore = 3.0,
+                gameWins = 1,
+                gameLosses = 2,
+                gameWinPercentage = 0.33,
+                opponentAverageGameWinPercentage = 0.66,
+                latestMatchUpdate = LocalDateTime.MIN
+            ),
+            StandingsModel(
+                playerName = "Alex",
+                score = 3,
+                matchWins = 1,
+                matchLosses = 0,
+                matchDraws = 0,
+                opponentAverageScore = 0.0,
+                gameWins = 2,
+                gameLosses = 1,
+                gameWinPercentage = 0.66,
+                opponentAverageGameWinPercentage = 0.33,
                 latestMatchUpdate = LocalDateTime.MIN
             )
         )

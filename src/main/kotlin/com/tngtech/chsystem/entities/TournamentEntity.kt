@@ -57,4 +57,12 @@ data class TournamentEntity(
 
         return tournamentPlayer.rank
     }
+
+    fun getRankOfPlayer(playerName: String): Int? {
+        val tournamentPlayer =
+            tournamentPlayers.find { tournamentPlayer -> tournamentPlayer.playerEntity.name == playerName }
+                ?: return null
+
+        return tournamentPlayer.rank
+    }
 }

@@ -158,7 +158,11 @@ class TournamentController(
             standings.add(standing)
         }
 
-        standings.sortByDescending { it }
+        if (tournament.state == TournamentState.DONE) {
+            standings.sortBy { standing -> tournament.getRankOfPlayer(standing.playerName) }
+        } else {
+            standings.sortByDescending { it }
+        }
 
         return standings
     }
