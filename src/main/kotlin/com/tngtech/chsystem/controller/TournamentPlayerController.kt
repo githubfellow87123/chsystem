@@ -4,6 +4,7 @@ import com.tngtech.chsystem.dao.PlayerRepository
 import com.tngtech.chsystem.dao.TournamentRepository
 import com.tngtech.chsystem.entities.TournamentEntity
 import com.tngtech.chsystem.entities.TournamentState
+import com.tngtech.chsystem.model.PlayerModel
 import com.tngtech.chsystem.model.PlayerToTournamentModel
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -14,7 +15,8 @@ import java.util.*
 @RequestMapping("tournaments/{tournamentId}/players")
 class TournamentPlayerController(
     private val tournamentRepository: TournamentRepository,
-    private val playerRepository: PlayerRepository
+    private val playerRepository: PlayerRepository,
+    private val random: Random
 ) {
 
     @PutMapping("{playerId}")
@@ -55,6 +57,15 @@ class TournamentPlayerController(
         } else {
             throw PlayerNotAssignedToTournamentException("Player with id $playerId is not assigned to tournament with id $tournamentId")
         }
+    }
+
+    @GetMapping("random")
+    fun getRandomListOfPlayers(@PathVariable tournamentId: UUID): List<PlayerModel> {
+        val tournament = findTournament(tournamentId)
+
+        return tournament.getPlayers()
+            .map { p -> p.toPlayerModel() }
+            .shuffled(random)
     }
 
     private fun checkTournamentState(tournament: TournamentEntity) {
@@ -99,5 +110,4 @@ class TournamentPlayerController(
 
     @ResponseStatus(HttpStatus.CONFLICT)
     class TournamentAlreadyStartedException(message: String) : RuntimeException(message)
-
 }

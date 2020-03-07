@@ -9,6 +9,16 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
+fun PlayerEntity.toPlayerModel() = PlayerModel(
+    id = id,
+    name = name,
+    createdAt = createdAt
+)
+
+fun PlayerModel.toPlayerEntity() = PlayerEntity(
+    name = name
+)
+
 @RestController
 @RequestMapping("players")
 class PlayerController(
@@ -100,14 +110,4 @@ class PlayerController(
     @ResponseStatus(HttpStatus.CONFLICT)
     class PlayerIdMismatchException(pathVariableId: UUID, requestBodyId: UUID) :
         RuntimeException("Id mismatch between path  $pathVariableId and request body $requestBodyId")
-
-    private fun PlayerEntity.toPlayerModel() = PlayerModel(
-        id = id,
-        name = name,
-        createdAt = createdAt
-    )
-
-    private fun PlayerModel.toPlayerEntity() = PlayerEntity(
-        name = name
-    )
 }

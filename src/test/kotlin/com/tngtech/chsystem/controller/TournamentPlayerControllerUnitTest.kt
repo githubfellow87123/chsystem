@@ -9,6 +9,7 @@ import com.tngtech.chsystem.model.PlayerToTournamentModel
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
+import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.slot
 import org.assertj.core.api.Assertions.assertThat
@@ -31,6 +32,9 @@ internal class TournamentPlayerControllerUnitTest {
 
     @MockK
     lateinit var playerRepository: PlayerRepository
+
+    @RelaxedMockK
+    lateinit var random: Random
 
     @Test
     fun assignPlayerToTournament() {
