@@ -11,6 +11,7 @@ import com.tngtech.chsystem.service.matchmaking.MatchmakingService
 import com.tngtech.chsystem.service.rank.RankingService
 import com.tngtech.chsystem.service.score.ScoreService
 import mu.KotlinLogging
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -46,6 +47,15 @@ class TournamentController(
         return tournamentRepository.findAll()
             .map { entity -> entity.toTournamentModel() }
             .sortedByDescending { tournament -> tournament.date }
+    }
+
+    @DeleteMapping("{id}")
+    fun deleteTournament(@PathVariable id: UUID) {
+        try {
+            tournamentRepository.deleteById(id)
+        } catch (e: EmptyResultDataAccessException) {
+            throw TournamentController.TournamentDoesNotExistException(id)
+        }
     }
 
     @PutMapping("{tournamentId}/start")
