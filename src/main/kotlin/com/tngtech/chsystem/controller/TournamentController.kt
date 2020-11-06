@@ -49,6 +49,18 @@ class TournamentController(
             .sortedByDescending { tournament -> tournament.date }
     }
 
+    @GetMapping("{id}")
+    fun findTournamentById(@PathVariable id: UUID): TournamentModel {
+
+        val tournament = tournamentRepository.findById(id)
+
+        if (tournament.isEmpty) {
+            throw TournamentDoesNotExistException(id)
+        }
+
+        return tournament.get().toTournamentModel()
+    }
+
     @DeleteMapping("{id}")
     fun deleteTournament(@PathVariable id: UUID) {
         try {
