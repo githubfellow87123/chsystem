@@ -18,6 +18,15 @@ class TournamentPlayerController(
     private val playerRepository: PlayerRepository
 ) {
 
+    @GetMapping
+    fun getPlayers(@PathVariable tournamentId: UUID): List<PlayerModel> {
+        val tournament = findTournament(tournamentId)
+
+        return tournament.getPlayers()
+            .sortedBy { it.name }
+            .map { p -> p.toPlayerModel() }
+    }
+
     @PutMapping("{playerId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun assignPlayerToTournament(

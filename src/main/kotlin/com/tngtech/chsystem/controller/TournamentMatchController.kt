@@ -1,7 +1,9 @@
 package com.tngtech.chsystem.controller
 
 import com.tngtech.chsystem.dao.MatchRepository
+import com.tngtech.chsystem.entities.MatchEntity
 import com.tngtech.chsystem.entities.TournamentState
+import com.tngtech.chsystem.model.MatchModel
 import com.tngtech.chsystem.model.MatchResultModel
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -14,6 +16,13 @@ import java.util.*
 class TournamentMatchController(
     val matchRepository: MatchRepository
 ) {
+
+    @GetMapping
+    fun getMatches(@PathVariable tournamentId: UUID): List<MatchModel> {
+        val matches = matchRepository.findAllByTournamentId(tournamentId).map { entity -> entity.toMatchModel() }
+
+        return matches;
+    }
 
     @PutMapping("{matchId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -64,4 +73,6 @@ class TournamentMatchController(
 
     @ResponseStatus(HttpStatus.CONFLICT)
     class TournamentInWrongStateException(message: String) : RuntimeException(message)
+
+    private fun MatchEntity.toMatchModel() = MatchModel(id, player1.name, player2?.name, roundIndex)
 }
