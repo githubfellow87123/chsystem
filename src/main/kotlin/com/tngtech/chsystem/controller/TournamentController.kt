@@ -66,7 +66,7 @@ class TournamentController(
         try {
             tournamentRepository.deleteById(id)
         } catch (e: EmptyResultDataAccessException) {
-            throw TournamentController.TournamentDoesNotExistException(id)
+            throw TournamentDoesNotExistException(id)
         }
     }
 
