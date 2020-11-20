@@ -74,5 +74,6 @@ class TournamentMatchController(
     @ResponseStatus(HttpStatus.CONFLICT)
     class TournamentInWrongStateException(message: String) : RuntimeException(message)
 
-    private fun MatchEntity.toMatchModel() = MatchModel(id, player1.name, player2?.name, roundIndex)
+    private fun MatchEntity.toMatchModel() =
+        MatchModel(id, tournament.id, player1.name, player2?.name, winsPlayer1, winsPlayer2, roundIndex)
 }
