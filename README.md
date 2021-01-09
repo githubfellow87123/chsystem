@@ -7,7 +7,18 @@ or
 
 1. `./gradlew -Pprofile=dev bootRun`
 
-## DB Connection Setup IntellIJ
+# Docker Image
+
+## Build
+
+1. `./gradlew -Pprofile=prod build`
+1. `docker build . -t chsystem`
+
+## Run
+
+`docker run -p 8080:8080 chsystem`
+
+# DB Connection Setup IntellIJ
 
 * Connection Type: Embedded
 * Driver: H2
