@@ -105,7 +105,7 @@ class PlayerController(
     class PlayerNotFoundException(id: UUID) : RuntimeException("No player found with id: $id")
 
     @ResponseStatus(HttpStatus.CONFLICT)
-    class DuplicatePlayerNameException(name: String) : RuntimeException("A player with $name already exists: $name")
+    class DuplicatePlayerNameException(name: String) : RuntimeException("A player with name '$name' already exists")
 
     @ResponseStatus(HttpStatus.CONFLICT)
     class PlayerIdMismatchException(pathVariableId: UUID, requestBodyId: UUID) :

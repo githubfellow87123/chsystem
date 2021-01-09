@@ -66,3 +66,7 @@ tasks.withType<KotlinCompile> {
         jvmTarget = "1.8"
     }
 }
+
+tasks.bootRun.configure {
+    systemProperty("spring.profiles.active", project.properties["profile"] ?: "dev")
+}
