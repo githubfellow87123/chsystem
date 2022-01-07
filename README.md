@@ -1,7 +1,7 @@
 # How to run
 
 1. `./gradlew -Pprofile=dev build`
-1. `java -jar build/libs/chsystem-1.0-SNAPSHOT.jar`
+1. `java -jar -Dspring.profiles.active=dev build/libs/chsystem-1.0-SNAPSHOT.jar`
 
 or
 
