@@ -20,6 +20,11 @@ or
 With prod db as bind
 mount: `docker run -p 8080:8080 -v /Users/b/dbs/chsystem_prod:/dbs chsystem:1.0 --spring.profiles.active=docker`
 
+## Start Frontend and Backend with docker-compose
+
+Both docker images have to be build upfront. Then start both with `docker-compose up`. If you want to build the
+containers upfront call `docker-compose up --build`.
+
 # DB Connection Setup IntellIJ
 
 * Connection Type: Embedded
