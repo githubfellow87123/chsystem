@@ -12,11 +12,11 @@ or
 ## Build
 
 1. `./gradlew -Pprofile=prod build`
-1. `docker build . -t chsystem`
+1. `docker build . -t chsystem:1.0`
 
 ## Run
 
-`docker run -p 8080:8080 chsystem`
+`docker run -p 8080:8080 chsystem:1.0`
 
 # DB Connection Setup IntellIJ
 
