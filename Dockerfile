@@ -12,7 +12,7 @@ RUN ./gradlew build
 
 ENTRYPOINT ["sleep", "60000"]
 
-FROM openjdk:8-jre-slim
+FROM openjdk:11-jre-slim
 
 WORKDIR /app
 COPY --from=builder /app/build/libs/chsystem-1.0-SNAPSHOT.jar chsystem-1.0-SNAPSHOT.jar
