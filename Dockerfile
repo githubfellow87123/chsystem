@@ -4,9 +4,11 @@ WORKDIR /app
 
 COPY gradle gradle
 COPY build.gradle.kts settings.gradle gradlew ./
+RUN ./gradlew build 2>/dev/null || true
+
 COPY src src
 
-RUN ./gradlew -Pprofile=prod build
+RUN ./gradlew build
 
 ENTRYPOINT ["sleep", "60000"]
 

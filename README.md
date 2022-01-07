@@ -17,6 +17,8 @@ or
 ## Run
 
 `docker run -p 8080:8080 chsystem:1.0`
+With prod db as bind
+mount: `docker run -p 8080:8080 -v /Users/b/dbs/chsystem_prod:/dbs chsystem:1.0 --spring.profiles.active=docker`
 
 # DB Connection Setup IntellIJ
 
