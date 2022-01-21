@@ -7,7 +7,7 @@ plugins {
     kotlin("plugin.allopen") version "1.6.10"
 
     id("org.springframework.boot") version "2.6.3"
-    id("io.spring.dependency-management") version "1.0.8.RELEASE"
+    id("io.spring.dependency-management") version "1.0.11.RELEASE"
 }
 
 allOpen {
@@ -31,7 +31,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("io.github.microutils:kotlin-logging:1.7.6")
+    implementation("io.github.microutils:kotlin-logging:2.1.21")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
@@ -43,8 +43,8 @@ dependencies {
         exclude(module = "mockito-core")
     }
     testImplementation("org.junit.jupiter:junit-jupiter-api")
-    testImplementation("com.ninja-squad:springmockk:1.1.3")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:1.3.61")
+    testImplementation("com.ninja-squad:springmockk:3.1.0")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.6.10")
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
