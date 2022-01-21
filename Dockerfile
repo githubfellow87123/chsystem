@@ -1,4 +1,4 @@
-FROM openjdk:11-jdk-slim as builder
+FROM eclipse-temurin:17-jdk-alpine as builder
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ RUN ./gradlew build
 
 ENTRYPOINT ["sleep", "60000"]
 
-FROM openjdk:11-jre-slim
+FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 COPY --from=builder /app/build/libs/chsystem-1.0-SNAPSHOT.jar chsystem-1.0-SNAPSHOT.jar
