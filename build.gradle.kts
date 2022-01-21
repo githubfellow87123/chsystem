@@ -6,7 +6,7 @@ plugins {
     kotlin("plugin.spring") version "1.6.10"
     kotlin("plugin.allopen") version "1.6.10"
 
-    id("org.springframework.boot") version "2.2.0.RELEASE"
+    id("org.springframework.boot") version "2.6.3"
     id("io.spring.dependency-management") version "1.0.8.RELEASE"
 }
 
@@ -22,13 +22,6 @@ java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
     mavenCentral()
-}
-
-val developmentOnly by configurations.creating
-configurations {
-    runtimeClasspath {
-        extendsFrom(developmentOnly)
-    }
 }
 
 dependencies {
