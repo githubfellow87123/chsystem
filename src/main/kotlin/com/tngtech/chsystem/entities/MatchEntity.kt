@@ -2,7 +2,7 @@ package com.tngtech.chsystem.entities
 
 import java.time.LocalDateTime
 import java.util.*
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "MATCH")

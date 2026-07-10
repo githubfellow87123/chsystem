@@ -4,7 +4,7 @@ Compact guidance for OpenCode sessions working in this repo.
 
 ## Stack
 
-- Kotlin 1.6.10, Spring Boot 2.6.3, Java/JDK 17, Gradle (Kotlin DSL, wrapper only — no installed Gradle required).
+- Kotlin 2.2.0, Spring Boot 4.1.0, Java/JDK 17 (builds and tests also pass on JDK 25), Gradle 9.0.0 (Kotlin DSL, wrapper only — no installed Gradle required). JPA uses `jakarta.persistence` (Spring Boot 3).
 - Single-module project. Package root: `com.tngtech.chsystem`. Entry point: `ChSystemApplication.kt`.
 - Persistence: Spring Data JPA + Hibernate over H2. `allOpen` is applied to JPA entities/embeddables/mapped superclasses (they must not be final).
 - No separate lint/formatter/typecheck tasks configured. `kotlin.code.style=official` is the only style signal — follow it and match surrounding files.

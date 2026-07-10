@@ -1,6 +1,6 @@
 package com.tngtech.chsystem.entities
 
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "TOURNAMENT_PLAYERS")

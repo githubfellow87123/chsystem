@@ -2,8 +2,8 @@ package com.tngtech.chsystem.entities
 
 import java.io.Serializable
 import java.util.*
-import javax.persistence.Column
-import javax.persistence.Embeddable
+import jakarta.persistence.Column
+import jakarta.persistence.Embeddable
 
 @Embeddable
 data class TournamentPlayerId(

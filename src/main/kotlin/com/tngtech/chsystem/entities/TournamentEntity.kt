@@ -3,7 +3,7 @@ package com.tngtech.chsystem.entities
 import java.time.LocalDate
 import java.util.*
 import java.util.stream.Collectors
-import javax.persistence.*
+import jakarta.persistence.*
 import kotlin.collections.HashSet
 
 @Entity

@@ -415,7 +415,7 @@ internal class PairingServiceUnitTest {
     }
 
     @Test
-    fun `assignOpponent skip both "played vs another" and "already has a match assigend"`() {
+    fun `assignOpponent skip both played vs another and already has a match assigend`() {
         val playerToMatches = mapOf(
             player1 to emptySet(),
             player2 to setOf(createMatch(player4, player2)),
