@@ -11,7 +11,7 @@ services:
     command:
       - "--spring.profiles.active=docker"
     volumes:
-      - "/Users/b/dbs/chsystem_prod:/dbs"
+      - "/home/weimerb/dbs/chsystem_prod:/dbs"
     ports:
       - "8080:8080"
 
