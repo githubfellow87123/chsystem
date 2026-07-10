@@ -1,0 +1,150 @@
+### ChSystem API — IntelliJ HTTP Client requests
+### Base URL
+@host = localhost
+@port = 8080
+
+### ---------------------------------------------------------------------------
+### Players
+### ---------------------------------------------------------------------------
+
+### Create a player
+POST http://{{host}}:{{port}}/players
+Content-Type: application/json
+
+{
+  "name": "Alex"
+}
+
+### Create another player
+POST http://{{host}}:{{port}}/players
+Content-Type: application/json
+
+{
+  "name": "Bert"
+}
+
+### Create a third player
+POST http://{{host}}:{{port}}/players
+Content-Type: application/json
+
+{
+  "name": "Chris"
+}
+
+### Create a fourth player
+POST http://{{host}}:{{port}}/players
+Content-Type: application/json
+
+{
+  "name": "Dana"
+}
+
+### Get all players
+GET http://{{host}}:{{port}}/players
+
+### Get player by id
+# Replace {{$player.id}} with an actual UUID from the create response
+GET http://{{host}}:{{port}}/players/{{$player.id}}
+
+### Update or insert player by id (upsert)
+# Replace {{$player.id}} with an actual UUID
+PUT http://{{host}}:{{port}}/players/{{$player.id}}
+Content-Type: application/json
+
+{
+  "name": "Alex Updated"
+}
+
+### Delete player by id
+# Replace {{$player.id}} with an actual UUID
+DELETE http://{{host}}:{{port}}/players/{{$player.id}}
+
+### ---------------------------------------------------------------------------
+### Tournaments
+### ---------------------------------------------------------------------------
+
+### Create a tournament
+POST http://{{host}}:{{port}}/tournaments
+Content-Type: application/json
+
+{
+  "date": "2026-07-10"
+}
+
+### List all tournaments
+GET http://{{host}}:{{port}}/tournaments
+
+### Get tournament by id
+# Replace {{$tournament.id}} with an actual UUID from the create response
+GET http://{{host}}:{{port}}/tournaments/{{$tournament.id}}
+
+### Delete tournament by id
+# Replace {{$tournament.id}} with an actual UUID
+DELETE http://{{host}}:{{port}}/tournaments/{{$tournament.id}}
+
+### Start tournament
+# Replace {{$tournament.id}} with an actual UUID
+PUT http://{{host}}:{{port}}/tournaments/{{$tournament.id}}/start
+
+### Generate matches for next round
+# Replace {{$tournament.id}} with an actual UUID
+POST http://{{host}}:{{port}}/tournaments/{{$tournament.id}}/nextRound
+
+### Finish tournament
+# Replace {{$tournament.id}} with an actual UUID
+PUT http://{{host}}:{{port}}/tournaments/{{$tournament.id}}/finish
+
+### Get tournament standings
+# Replace {{$tournament.id}} with an actual UUID
+GET http://{{host}}:{{port}}/tournaments/{{$tournament.id}}/standings
+
+### ---------------------------------------------------------------------------
+### Tournament Players
+### ---------------------------------------------------------------------------
+
+### Get players of a tournament
+# Replace {{$tournament.id}} with an actual UUID
+GET http://{{host}}:{{port}}/tournaments/{{$tournament.id}}/players
+
+### Assign player to tournament
+# Replace {{$tournament.id}} and {{$player.id}} with actual UUIDs
+PUT http://{{host}}:{{port}}/tournaments/{{$tournament.id}}/players/{{$player.id}}
+Content-Type: application/json
+
+{
+  "tournamentId": "{{$tournament.id}}",
+  "playerId": "{{$player.id}}"
+}
+
+### Remove player from tournament
+# Replace {{$tournament.id}} and {{$player.id}} with actual UUIDs
+DELETE http://{{host}}:{{port}}/tournaments/{{$tournament.id}}/players/{{$player.id}}
+Content-Type: application/json
+
+{
+  "tournamentId": "{{$tournament.id}}",
+  "playerId": "{{$player.id}}"
+}
+
+### Get seating order
+# Replace {{$tournament.id}} with an actual UUID
+GET http://{{host}}:{{port}}/tournaments/{{$tournament.id}}/players/seatingOrder
+
+### ---------------------------------------------------------------------------
+### Tournament Matches
+### ---------------------------------------------------------------------------
+
+### Get all matches of a tournament
+# Replace {{$tournament.id}} with an actual UUID
+GET http://{{host}}:{{port}}/tournaments/{{$tournament.id}}/matches
+
+### Enter match result
+# Replace {{$tournament.id}} and {{$match.id}} with actual UUIDs
+PUT http://{{host}}:{{port}}/tournaments/{{$tournament.id}}/matches/{{$match.id}}
+Content-Type: application/json
+
+{
+  "id": "{{$match.id}}",
+  "winsPlayer1": 2,
+  "winsPlayer2": 1
+}
