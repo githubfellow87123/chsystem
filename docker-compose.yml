@@ -1,5 +1,19 @@
-version: "3.9"
 services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: chsystem
+      POSTGRES_USER: chsystem
+      POSTGRES_PASSWORD: chsystem
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chsystem"]
+      interval: 1s
+      timeout: 5s
+      retries: 5
   frontend:
     build: ../chsystem-frontend
     image: "chsystem-frontend:1.0"
@@ -10,8 +24,12 @@ services:
     image: chsystem:1.0
     command:
       - "--spring.profiles.active=docker"
-    volumes:
-      - "/home/weimerb/dbs/chsystem_prod:/dbs"
+    depends_on:
+      postgres:
+        condition: service_healthy
     ports:
       - "8080:8080"
+
+volumes:
+  postgres_data:
 
